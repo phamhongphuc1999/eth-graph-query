@@ -11,4 +11,8 @@ test('Eth graph query', function (t) {
     st.equal(query.root, root);
     st.end();
   });
+  t.test('Test query', async function (st) {
+    const result = await query.query('commissions', { elements: ['id'] });
+    st.ok(result);
+  });
 });

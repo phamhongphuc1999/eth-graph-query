@@ -1,0 +1,30 @@
+name: eth-graph-workflow
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '!**.md'
+      - '!**.sh'
+      - '!.gitignore'
+    pull_request:
+      branches:
+        - main
+        - develop
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup node environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install packages
+        run: npm install
+      - name: Unit test
+        run: npm run test
+      - name: build
+        run: npm run build

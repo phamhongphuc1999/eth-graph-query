@@ -5,11 +5,8 @@ export default class QueryBuilder {
     const whereList = [];
     for (const key in query) {
       if (query[key] != undefined) {
-        if (typeof query[key] == 'object') {
-          whereList.push(`${key}: {${this.buildJsonQuery(query[key] as QueryJson)}}`);
-        } else {
-          whereList.push(`${key}: ${query[key]}`);
-        }
+        if (typeof query[key] == 'object') whereList.push(`${key}: {${this.buildJsonQuery(query[key] as QueryJson)}}`);
+        else whereList.push(`${key}: ${query[key]}`);
       }
     }
     return whereList.join(', ');
