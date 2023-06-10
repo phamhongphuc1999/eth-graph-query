@@ -1,6 +1,6 @@
 {
   "name": "eth-graph-query",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "simple package for create query command to the GraphQL in ethereum",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,7 +20,7 @@
     "url": "git+https://github.com/phamhongphuc1999/eth-graph-query.git"
   },
   "keywords": [
-    "the graph", 
+    "graphql", 
     "ethereum"
   ],
   "author": "phamhongphuc1999",

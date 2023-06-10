@@ -1,8 +1,8 @@
-export type QueryJson = { [key: string]: QueryJson | string | number | boolean | undefined };
+export type QueryJson = { [key: string]: QueryJson | Array<string> | string | number | boolean | undefined };
 export type BlockQuery = { hash?: string; number?: number; number_gte?: number };
 
 export interface GraphParams {
-  elements: Array<string>;
+  elements?: Array<string>;
   where?: QueryJson;
   id?: string;
   first?: number;
