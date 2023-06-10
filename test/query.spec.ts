@@ -1,10 +1,10 @@
-import * as test from 'tape';
+import * as tape from 'tape';
 import EthGraphQuery from '../src';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
-test('Eth graph query', function (t) {
+tape('Eth graph query', function (t) {
   const root = process.env.TEST_API_ROOT ?? '';
   const query = new EthGraphQuery(root);
   t.test('Test parameters', async function (st) {

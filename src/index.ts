@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import NormalQuery from './normal-query';
-import { GraphParams } from './type';
 import QueryBuilder from './query-builder';
+import { GraphParams } from './type';
 
 export default class EthGraphQuery extends NormalQuery {
   constructor(rootUrl: string, config?: AxiosRequestConfig) {

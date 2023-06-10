@@ -1,4 +1,4 @@
-import * as test from 'tape';
+import * as tape from 'tape';
 import QueryBuilder from '../src/query-builder';
 
 const simpleWhereQuery = {
@@ -12,7 +12,7 @@ const simpleWhereQuery = {
   key5: ['1', '2', '3'],
 };
 
-test('Build query', function (t) {
+tape('Build query', function (t) {
   t.test('Build json query', function (st) {
     const jsonQuery = QueryBuilder.buildJsonQuery(simpleWhereQuery);
     st.ok(jsonQuery.length);
