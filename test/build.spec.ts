@@ -1,15 +1,15 @@
 import * as tape from 'tape';
 import QueryBuilder from '../src/query-builder';
+import { QueryJson } from '../src/type';
 
-const simpleWhereQuery = {
+const simpleWhereQuery: QueryJson = {
   key1: 'a',
   key2: 123,
-  key3: {
-    sub31: 'abc',
-    sub32: 321,
-  },
+  key3: { sub31: 'abc', sub32: 321 },
   key4: true,
   key5: ['1', '2', '3'],
+  key6: { contains: 'abc', not: 123 },
+  key7: { not_contains_nocase: 'starwar' },
 };
 
 tape('Build query', function (t) {
@@ -53,7 +53,11 @@ tape('Build query', function (t) {
       },
       {
         collection: 'collection2',
-        params: { elements: ['element3', 'element4'], skip: 1000, block: { hash: '0x123', number: 1234 } },
+        params: {
+          elements: ['element3', 'element4'],
+          skip: 1000,
+          block: { hash: '0x123', number: 1234 },
+        },
       },
     ]);
     const fullQuery = QueryBuilder.makeFullQuery(query);

@@ -2,7 +2,7 @@
 eth-graph-query
 </h1>
 
-Simple package for create query command to the GraphQL in ethereum
+Simple package for create query command to [the GraphQL](https://thegraph.com/).
 
 ---
 
@@ -33,9 +33,29 @@ const result = await query.query('collection1', { elements: ['element1', 'elemen
 
 ```js
 const result = await query.mergeQuery([
-  {collection: 'collection1', {element: ['element11', 'element12']}},
-  {collection: 'collection2', {element: ['element21', 'element22']}}
-])
+  { collection: 'collection1', params: { elements: ['element11', 'element12'] } },
+  { collection: 'collection2', params: { elements: ['element21', 'element22'] } },
+]);
+```
+
+- You can create a complex query
+
+```js
+const result = await query.mergeQuery([
+  { collection: 'collection1', params: { elements: ['element11', 'element12'], where: { element11: 'abc' } } },
+  {
+    collection: 'collection2',
+    params: {
+      elements: [
+        'element21',
+        {
+          collection: 'collection3',
+          params: { elements: ['element31'], where: { id: { in: ['123'] }, element11: 'element31' }, first: 50 },
+        },
+      ],
+    },
+  },
+]);
 ```
 
 ---

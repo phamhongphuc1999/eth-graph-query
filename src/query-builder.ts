@@ -1,6 +1,16 @@
-import { GraphParams, QueryJson } from './type';
+import { ElementType, GraphParams, OptionKeys, OptionsKey, QueryJson, WhereOptions } from './type';
 
 export default class QueryBuilder {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static isWhereOptions(data: any) {
+    const keys = Object.keys(data);
+    if (keys.length == 0) return true;
+    for (const key of keys) {
+      if (!OptionKeys.includes(key)) return false;
+    }
+    return true;
+  }
+
   static buildJsonQuery(query: QueryJson): string {
     const whereList = [];
     for (const key in query) {
@@ -8,6 +18,14 @@ export default class QueryBuilder {
         if (Array.isArray(query[key])) {
           const queryArray = query[key] as Array<string>;
           whereList.push(`${key}: [${queryArray.map((item) => `"${item}"`).join(', ')}]`);
+        } else if (this.isWhereOptions(query[key])) {
+          const realJson: QueryJson = {};
+          const options = query[key] as WhereOptions;
+          for (const option in options) {
+            const value = options[option as OptionsKey];
+            if (value) realJson[`${key}_${option}`] = value;
+          }
+          whereList.push(`${this.buildJsonQuery(realJson as QueryJson)}`);
         } else if (typeof query[key] == 'object')
           whereList.push(`${key}: {${this.buildJsonQuery(query[key] as QueryJson)}}`);
         else if (typeof query[key] == 'string') whereList.push(`${key}: "${query[key]}"`);
@@ -15,6 +33,18 @@ export default class QueryBuilder {
       }
     }
     return whereList.join(', ');
+  }
+
+  static buildElements(elements: Array<ElementType>): Array<string> {
+    const elementList = [];
+    for (const element of elements) {
+      if (typeof element == 'string') elementList.push(element);
+      else {
+        const object = element as { collection: string; params: GraphParams };
+        elementList.push(this.buildQuery(object.collection, object.params));
+      }
+    }
+    return elementList;
   }
 
   static buildQuery(collection: string, params?: GraphParams) {
@@ -41,8 +71,8 @@ export default class QueryBuilder {
       if (sBlock.length > 0) filters.push(`block: {${sBlock}}`);
     }
     const filterString = filters.join(', ');
-    let elements = ['id'];
-    if (params?.elements) if (params.elements.length > 0) elements = params.elements;
+    let elements: Array<string> = ['id'];
+    if (params?.elements) if (params.elements.length > 0) elements = this.buildElements(params.elements);
     if (filterString.length > 0) return `${collection}(${filterString}) {${elements.join(' ')}}`;
     else return `${collection} {${elements.join(' ')}}`;
   }

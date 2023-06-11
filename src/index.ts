@@ -3,12 +3,12 @@ import NormalQuery from './normal-query';
 import QueryBuilder from './query-builder';
 import { GraphParams } from './type';
 
-export default class EthGraphQuery extends NormalQuery {
+export default class CoreGraphQuery extends NormalQuery {
   constructor(rootUrl: string, config?: AxiosRequestConfig) {
     super(rootUrl, config);
   }
 
-  private async _fetch(query: string) {
+  protected async _fetch(query: string) {
     return await this.post('', { query: query });
   }
 
