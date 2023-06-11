@@ -17,7 +17,7 @@ npm install eth-graph-query
 
 ### Usage
 
-- The first thing you have to do is create a query instance
+- The first thing you have to do is creating a query instance
 
 ```js
 const query = new EthGraphQuery(root);

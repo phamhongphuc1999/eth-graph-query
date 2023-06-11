@@ -1,20 +1,28 @@
 {
   "name": "eth-graph-query",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "simple package for create query command to the GraphQL in ethereum",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "files": [
-    "lib"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "./scripts/ts-build.sh",
     "prepare": "npm run build && husky install",
     "tape": "tape -r ts-node/register",
     "test:browser": "karma start karma.conf.js",
     "test:node": "npm run tape -- test/*.spec.ts",
     "test": "npm run test:node && npm run test:browser",
-    "eslint": "eslint . --ext .ts"
+    "eslint": "eslint . --ext .ts",
+    "prepublish": "npm run build && npm run test"
   },
   "repository": {
     "type": "git",

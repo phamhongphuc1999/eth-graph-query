@@ -1,8 +1,12 @@
 import * as tape from 'tape';
 import EthGraphQuery from '../src';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config();
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  require('dotenv').config();
+} catch (error) {
+  console.error(error);
+}
 
 tape('Eth graph query', function (t) {
   const root = process.env.TEST_API_ROOT ?? '';
