@@ -1,5 +1,5 @@
 import * as tape from 'tape';
-import CoreGraphQuery from '../src';
+import EthGraphQuery from '../src';
 
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -10,19 +10,19 @@ try {
 
 tape('Eth graph query', function (t) {
   const root = process.env.TEST_API_ROOT ?? '';
-  const query = new CoreGraphQuery(root);
+  const query = new EthGraphQuery(root);
   t.test('Test parameters', async function (st) {
     st.equal(query.root, root);
     st.end();
   });
   t.test('Test simple query', async function (st) {
     const result = await query.query('commissions', { elements: ['id'] });
-    st.false('errors' in result);
+    st.ok(result);
     st.end();
   });
   t.test('Test ethereum address query', async function (st) {
     const result = await query.query('users', { where: { id: '0x595622cbd0fc4727df476a1172ada30a9ddf8f43' } });
-    st.false('errors' in result);
+    st.ok(result);
     st.end();
   });
   t.test('Test complex query', async function (st) {
@@ -45,7 +45,7 @@ tape('Eth graph query', function (t) {
         },
       },
     ]);
-    st.false('errors' in result);
+    st.ok(result);
     st.end();
   });
 });

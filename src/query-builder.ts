@@ -2,7 +2,7 @@ import { ElementType, GraphParams, OptionKeys, OptionsKey, QueryJson, WhereOptio
 
 export default class QueryBuilder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  static isWhereOptions(data: any) {
+  private static isWhereOptions(data: any) {
     const keys = Object.keys(data);
     if (keys.length == 0) return true;
     for (const key of keys) {
@@ -47,7 +47,7 @@ export default class QueryBuilder {
     return elementList;
   }
 
-  static buildQuery(collection: string, params?: GraphParams) {
+  static buildQuery(collection: string, params?: GraphParams): string {
     const filters: Array<string> = [];
     if (params?.id != undefined) filters.push(`id: ${params.id}`);
     if (params?.orderBy) filters.push(`orderBy: ${params.orderBy}`);
@@ -77,13 +77,13 @@ export default class QueryBuilder {
     else return `${collection} {${elements.join(' ')}}`;
   }
 
-  static mergeQuery(data: Array<{ collection: string; params?: GraphParams }>) {
+  static mergeQuery(data: Array<{ collection: string; params?: GraphParams }>): string {
     const queries: Array<string> = [];
     for (const item of data) queries.push(this.buildQuery(item.collection, item.params));
     return queries.join(' ');
   }
 
-  static makeFullQuery(query: string) {
+  static makeFullQuery(query: string): string {
     return `query MyQuery {${query}}`;
   }
 }

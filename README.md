@@ -2,7 +2,7 @@
 eth-graph-query
 </h1>
 
-Simple package for create query command to [the GraphQL](https://thegraph.com/).
+Simple package for create query to [the GraphQL](https://thegraph.com/).
 
 ---
 
@@ -11,6 +11,12 @@ Simple package for create query command to [the GraphQL](https://thegraph.com/).
 ```shell
 npm install eth-graph-query
 
+```
+
+- Or if you use `yarn`
+
+```shell
+yarn add eth-graph-query
 ```
 
 ---
@@ -41,7 +47,7 @@ const result = await query.mergeQuery([
 - You can create a complex query
 
 ```js
-const result = await query.mergeQuery([
+const result1 = await query.mergeQuery([
   { collection: 'collection1', params: { elements: ['element11', 'element12'], where: { element11: 'abc' } } },
   {
     collection: 'collection2',
@@ -50,13 +56,20 @@ const result = await query.mergeQuery([
         'element21',
         {
           collection: 'collection3',
-          params: { elements: ['element31'], where: { id: { in: ['123'] }, element11: 'element31' }, first: 50 },
+          params: { elements: ['element31'], where: { id: { in: ['123'] }, element31: 'element31' }, first: 50 },
         },
       ],
+      where: { element21: '123', collection3: { element31: '123' } },
     },
   },
 ]);
 ```
+
+---
+
+### API
+
+Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/docs/api.md)
 
 ---
 
