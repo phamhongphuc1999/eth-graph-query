@@ -16,7 +16,7 @@ export const OptionKeys = [
   'gt',
   'gte',
   'lt',
-  'lts',
+  'lte',
   'not',
   'in',
   'not_in',
@@ -71,6 +71,12 @@ export type WhereOptions = TextWhereOptions & CommonWhereOptions;
 
 export type QueryJson = { [key: string]: QueryJson | WhereOptions | BaseQueryType };
 export type BlockQuery = { hash?: string; number?: number; number_gte?: number };
+
+export type Metadata = {
+  elements?: Array<'deployment' | 'hasIndexingErrors' | 'hash' | 'number' | 'timestamp'>;
+  blockQuery?: BlockQuery;
+};
+
 export type ElementType = string | { collection: string; params?: GraphParams };
 
 export interface GraphParams {

@@ -19,18 +19,24 @@ tape('Build query', function (t) {
     st.end();
   });
   t.test('Build query', function (st) {
-    const query = QueryBuilder.buildQuery('collection1', {
-      elements: ['element1', 'element2'],
-      where: simpleWhereQuery,
-      id: '123',
-      orderBy: 'element1',
-      orderDirection: 'asc',
-      skip: 100,
-      subgraphError: 'allow',
-      block: {
-        hash: '123456789',
+    const query = QueryBuilder.buildQuery(
+      {
+        collection: 'collection1',
+        params: {
+          elements: ['element1', 'element2'],
+          where: simpleWhereQuery,
+          id: '123',
+          orderBy: 'element1',
+          orderDirection: 'asc',
+          skip: 100,
+          subgraphError: 'allow',
+          block: {
+            hash: '123456789',
+          },
+        },
       },
-    });
+      { elements: ['deployment', 'number'], blockQuery: { hash: '0x123' } },
+    );
     const fullQuery = QueryBuilder.makeFullQuery(query);
     st.ok(query.length);
     st.ok(fullQuery.length);
@@ -44,7 +50,7 @@ tape('Build query', function (t) {
           elements: [
             'element1',
             'element2',
-            QueryBuilder.buildQuery('collection3', { elements: ['element5', 'element6'] }),
+            QueryBuilder.buildQuery({ collection: 'collection3', params: { elements: ['element5', 'element6'] } }),
           ],
           where: simpleWhereQuery,
           id: '123',

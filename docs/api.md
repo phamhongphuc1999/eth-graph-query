@@ -69,7 +69,29 @@ const result = await query.query('collection1', {
 });
 ```
 
-- In above example, the query will get all documents that have element1 equal 1234. Moreover, the id of documents has to get `0x1234` or `0x4321`.
+- In above example, the query will get all documents that have element1 equal 1234. Moreover, the id of documents has to get `0x1234` or `0x4321`. Graphql support some operators
+
+| id  | operator               |
+| :-- | :--------------------- |
+| 1   | contains               |
+| 2   | contains_nocase        |
+| 3   | ends_with              |
+| 4   | end_with_nocase        |
+| 5   | starts_with            |
+| 6   | starts_with_nocase     |
+| 7   | not_contains           |
+| 8   | not_contains_nocase    |
+| 9   | not_ends_with          |
+| 10  | not_ends_with_nocase   |
+| 11  | not_starts_with        |
+| 12  | not_starts_with_nocase |
+| 13  | gt                     |
+| 14  | gte                    |
+| 15  | lt                     |
+| 16  | lte                    |
+| 17  | not                    |
+| 18  | in                     |
+| 19  | not_in                 |
 
 #### BlockQuery <a name="block_query"></a>
 

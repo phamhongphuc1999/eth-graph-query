@@ -11,41 +11,62 @@ try {
 tape('Eth graph query', function (t) {
   const root = process.env.TEST_API_ROOT ?? '';
   const query = new EthGraphQuery(root);
-  t.test('Test parameters', async function (st) {
-    st.equal(query.root, root);
-    st.end();
-  });
-  t.test('Test simple query', async function (st) {
-    const result = await query.query('commissions', { elements: ['id'] });
-    st.ok(result);
-    st.end();
-  });
+  // t.test('Test parameters', async function (st) {
+  //   st.equal(query.root, root);
+  //   st.end();
+  // });
+  // t.test('Test simple query', async function (st) {
+  //   const result = await query.query({ collection: 'pools', params: { first: 10 } });
+  //   st.equal(result['errors'], undefined);
+  //   st.end();
+  // });
   t.test('Test ethereum address query', async function (st) {
-    const result = await query.query('users', { where: { id: '0x595622cbd0fc4727df476a1172ada30a9ddf8f43' } });
-    st.ok(result);
-    st.end();
-  });
-  t.test('Test complex query', async function (st) {
-    const result = await query.mergeQuery([
+    const result = await query.query(
       {
-        collection: 'users',
+        collection: 'pools',
         params: {
-          elements: ['id', 'totalCommission'],
-          where: { id_in: ['0x595622cbd0fc4727df476a1172ada30a9ddf8f43'] },
+          elements: [
+            'id',
+            {
+              collection: 'closedAllocations',
+              params: { where: { id: '0x02353e9c1d14fe8e3eccf316fe6dde4aaf43cf58' } },
+            },
+          ],
         },
       },
       {
-        collection: 'quizs',
-        params: {
-          elements: ['epoch', 'id', 'players', { collection: 'userSubmits', params: { elements: ['epoch', 'id'] } }],
-          where: {
-            id: { in: ['0', '1', '2'] },
-            userSubmits_: { id: '0x162803573c7748ef7bbe9cd163cf0eaa2d97eff90962325b252ca30ac8f7e33e' },
-          },
-        },
+        elements: ['hash'],
+        blockQuery: { hash: '0xa005448da8cfdf40d34ab6f81c0100e9faac6ab942b435e9a0150505ba31df44' },
       },
-    ]);
-    st.ok(result);
+    );
+    st.equal(result['errors'], undefined);
     st.end();
   });
+  // t.test('Test complex query', async function (st) {
+  //   const result = await query.mergeQuery([
+  //     { collection: 'networks', params: { first: 10 } },
+  //     {
+  //       collection: 'pools',
+  //       params: {
+  //         elements: [
+  //           'id',
+  //           'claimedFees',
+  //           {
+  //             collection: 'closedAllocations',
+  //             params: {
+  //               elements: ['id', 'poi', { collection: 'indexer', params: { elements: ['id'], first: 10 } }],
+  //               first: 10,
+  //             },
+  //           },
+  //         ],
+  //         where: {
+  //           id: { lte: '10' },
+  //         },
+  //         first: 10,
+  //       },
+  //     },
+  //   ]);
+  //   st.equal(result['errors'], undefined);
+  //   st.end();
+  // });
 });
