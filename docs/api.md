@@ -10,14 +10,15 @@ The idea when create this package is trying to use `Json format` for create quer
 
 - [EthGraphQuery](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/index.ts)
 
-  - async query<T>(collection: string, params?: [GraphParams](#graph_params)): fetch data with a single query
-  - async mergeQuery<T>(data: Array<{ collection: string; params?: [GraphParams](#graph_params) }>): fetch data with a multiple query
+  - async query<T = any>(data: { collection: string; params?: [GraphParams](#graph_params) }, metadata?: [Metadata](#metadata)): fetch data with a single query
+  - async mergeQuery<T = any>(data: Array<{ collection: string; params?: [GraphParams](#graph_params) }>, metadata?: [Metadata](#metadata)): fetch data with a multiple query
 
 - static [QueryBuilder](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/query-builder.ts)
-  - buildJsonQuery(query: QueryJson): build `json string format`
-  - buildElements(elements: Array<ElementType>): build `elements array string format`
-  - buildQuery(collection: string, params?: [GraphParams](#graph_params)): build a single query
-  - mergeQuery(data: Array<{ collection: string; params?: [GraphParams](#graph_params) }>): build a multiple query
+  - buildJsonQuery(query: [QueryJson](#query_json)): build json string format
+  - buildElements(elements: Array<[ElementType](#element_type)>): build elements array string format
+  - static buildMetadata(metadata: [Metadata](#metadata)): build metadata
+  - buildQuery(data: { collection: string; params?: [GraphParams](#graph_params) }, metadata?: [Metadata](#metadata)): build a single query
+  - mergeQuery(data: Array<{ collection: string; params?: [GraphParams](#graph_params) }>, metadata?: [Metadata](#metadata)): build a multiple query
   - makeFullQuery(query: string): create final query
 
 ---
@@ -54,18 +55,24 @@ The idea when create this package is trying to use `Json format` for create quer
 
 ```js
 const query = new EthGraphQuery(root);
-const result = await query.query('collection1', {
-  elements: ['element1', 'element2'],
-  where: { element1: '1234' },
+const result = await query.query({
+  collection: 'collection1',
+  params: {
+    elements: ['element1', 'element2'],
+    where: { element1: '1234' },
+  },
 });
 ```
 
 - In above example, a query will get all documents that have element1 equal 1234. In more complex case, `option query` create a more complicated that `normal`.
 
 ```js
-const result = await query.query('collection1', {
-  elements: ['element1', 'element2'],
-  where: { element1: '1234', id: { in: ['0x1234', '0x4321'] } },
+const result = await query.query({
+  collection: 'collection1',
+  params: {
+    elements: ['element1', 'element2'],
+    where: { element1: '1234', id: { in: ['0x1234', '0x4321'] } },
+  },
 });
 ```
 
@@ -96,3 +103,5 @@ const result = await query.query('collection1', {
 #### BlockQuery <a name="block_query"></a>
 
 - `BlockQuery` is block query of graph query. If you define it, you can get the data in a particular block number or block hash.
+
+#### Metadata <a name="metadata"></a>

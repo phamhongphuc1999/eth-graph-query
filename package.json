@@ -1,6 +1,6 @@
 {
   "name": "eth-graph-query",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "simple package for create query command to the GraphQL in ethereum",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

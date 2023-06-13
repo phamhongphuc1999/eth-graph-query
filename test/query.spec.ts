@@ -11,15 +11,15 @@ try {
 tape('Eth graph query', function (t) {
   const root = process.env.TEST_API_ROOT ?? '';
   const query = new EthGraphQuery(root);
-  // t.test('Test parameters', async function (st) {
-  //   st.equal(query.root, root);
-  //   st.end();
-  // });
-  // t.test('Test simple query', async function (st) {
-  //   const result = await query.query({ collection: 'pools', params: { first: 10 } });
-  //   st.equal(result['errors'], undefined);
-  //   st.end();
-  // });
+  t.test('Test parameters', async function (st) {
+    st.equal(query.root, root);
+    st.end();
+  });
+  t.test('Test simple query', async function (st) {
+    const result = await query.query({ collection: 'pools', params: { first: 10 } });
+    st.equal(result['errors'], undefined);
+    st.end();
+  });
   t.test('Test ethereum address query', async function (st) {
     const result = await query.query(
       {
@@ -42,31 +42,31 @@ tape('Eth graph query', function (t) {
     st.equal(result['errors'], undefined);
     st.end();
   });
-  // t.test('Test complex query', async function (st) {
-  //   const result = await query.mergeQuery([
-  //     { collection: 'networks', params: { first: 10 } },
-  //     {
-  //       collection: 'pools',
-  //       params: {
-  //         elements: [
-  //           'id',
-  //           'claimedFees',
-  //           {
-  //             collection: 'closedAllocations',
-  //             params: {
-  //               elements: ['id', 'poi', { collection: 'indexer', params: { elements: ['id'], first: 10 } }],
-  //               first: 10,
-  //             },
-  //           },
-  //         ],
-  //         where: {
-  //           id: { lte: '10' },
-  //         },
-  //         first: 10,
-  //       },
-  //     },
-  //   ]);
-  //   st.equal(result['errors'], undefined);
-  //   st.end();
-  // });
+  t.test('Test complex query', async function (st) {
+    const result = await query.mergeQuery([
+      { collection: 'networks', params: { first: 10 } },
+      {
+        collection: 'pools',
+        params: {
+          elements: [
+            'id',
+            'claimedFees',
+            {
+              collection: 'closedAllocations',
+              params: {
+                elements: ['id', 'poi', { collection: 'indexer', params: { elements: ['id'], first: 10 } }],
+                first: 10,
+              },
+            },
+          ],
+          where: {
+            id: { lte: '10' },
+          },
+          first: 10,
+        },
+      },
+    ]);
+    st.equal(result['errors'], undefined);
+    st.end();
+  });
 });

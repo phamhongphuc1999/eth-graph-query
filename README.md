@@ -32,7 +32,7 @@ const query = new EthGraphQuery(root);
 - This package has two query options. To create simple query
 
 ```js
-const result = await query.query('collection1', { elements: ['element1', 'element2'] });
+const result = await query.query({ collection: 'collection1', params: { elements: ['element1', 'element2'] } });
 ```
 
 - To create a multiple query
