@@ -2,7 +2,7 @@
 eth-graph-query
 </h1>
 
-Simple package for create query to [the GraphQL](https://thegraph.com/).
+Simple package for creating query to [the GraphQL](https://thegraph.com/).
 
 ---
 

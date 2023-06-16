@@ -12,7 +12,7 @@ export default class EthGraphQuery extends NormalQuery {
     this.queryName = 'query';
   }
 
-  protected async _fetch<T>(query: string) {
+  async _fetch<T>(query: string) {
     return await this.post<{ query: string }, T>('', { query: query });
   }
 
