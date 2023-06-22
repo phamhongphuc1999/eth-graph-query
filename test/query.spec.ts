@@ -9,7 +9,8 @@ try {
 }
 
 tape('Eth graph query', function (t) {
-  const root = process.env.TEST_API_ROOT ?? '';
+  const root =
+    process.env.TEST_API_ROOT ?? 'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet';
   const query = new EthGraphQuery(root);
   t.test('Test parameters', async function (st) {
     st.equal(query.root, root);

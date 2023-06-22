@@ -69,7 +69,7 @@ const result1 = await query.mergeQuery([
 
 ### API
 
-Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/docs/api.md)
+Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/docs/api.md), you also read my [examples](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/examples)
 
 ---
 
