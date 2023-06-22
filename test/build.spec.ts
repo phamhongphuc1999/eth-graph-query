@@ -50,7 +50,7 @@ tape('Build query', function (t) {
           elements: [
             'element1',
             'element2',
-            QueryBuilder.buildQuery({ collection: 'collection3', params: { elements: ['element5', 'element6'] } }),
+            { collection: 'collection3', params: { elements: ['element5', 'element6'] } },
           ],
           where: simpleWhereQuery,
           id: '123',

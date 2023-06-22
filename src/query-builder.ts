@@ -11,6 +11,11 @@ export default class QueryBuilder {
     return true;
   }
 
+  /**
+   * Create a query string from a query with json format.
+   * @param {QueryJson} query the json format query
+   * @returns a query string respective with the json format query
+   */
   static buildJsonQuery(query: QueryJson): string {
     const whereList = [];
     for (const key in query) {
@@ -35,6 +40,11 @@ export default class QueryBuilder {
     return whereList.join(', ');
   }
 
+  /**
+   * Given a json format array as element input, returns the string array represent elements you want to query in the graph.
+   * @param {Array<ElementType>} elements A array with {@link ElementType} elements, each element in the array represent a element in the graph you want to query
+   * @returns {Array<string>} The string array represent the input array
+   */
   static buildElements(elements: Array<ElementType>): Array<string> {
     const elementList = [];
     for (const element of elements) {
@@ -47,6 +57,11 @@ export default class QueryBuilder {
     return elementList;
   }
 
+  /**
+   * Given a instance of {@link Metadata}, returns the string represent the metadata you want to query
+   * @param {Metadata} metadata The instance represent all metadata you want to query
+   * @returns The string represent the metadata you want to query
+   */
   static buildMetadata(metadata: Metadata): string {
     let result = '';
     const blockQuery = [];
@@ -77,6 +92,14 @@ export default class QueryBuilder {
     return result.length > 0 ? `_meta${result}` : '';
   }
 
+  /**
+   * Given json data, returns the string query. This function only can create a string query for a particular collection.
+   * @param {{ collection: string; params?: GraphParams }} data An data for create query, contains two elements:
+   *   1. collection: string - collection name
+   *   2. params: GraphParams | undefined - If it is defined, it create a query to the collection
+   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
+   * @returns The string query
+   */
   static buildQuery(data: { collection: string; params?: GraphParams }, metadata?: Metadata): string {
     const collection = data.collection;
     const params = data.params;
@@ -116,6 +139,12 @@ export default class QueryBuilder {
     return finalQuery;
   }
 
+  /**
+   * Given a array contain many json data, return a query string represent a query to all collections that is in a array.
+   * @param {Array<{ collection: string; params?: GraphParams }>} data An array contain data to query to many collections
+   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
+   * @returns The query string
+   */
   static mergeQuery(data: Array<{ collection: string; params?: GraphParams }>, metadata?: Metadata): string {
     const queries: Array<string> = [];
     for (const item of data) queries.push(this.buildQuery({ collection: item.collection, params: item.params }));
@@ -128,6 +157,12 @@ export default class QueryBuilder {
     return finalQuery;
   }
 
+  /**
+   * Create complete query string, you can use directly this query to query to the graph
+   * @param {string} query The query string
+   * @param {string} queryName The query name(default query)
+   * @returns The complete query string
+   */
   static makeFullQuery(query: string, queryName = 'query'): string {
     return `query ${queryName} {${query}}`;
   }
