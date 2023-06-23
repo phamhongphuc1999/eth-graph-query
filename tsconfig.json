@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "es6",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
@@ -10,7 +13,7 @@
     "resolveJsonModule": true,
     "downlevelIteration": true,
     "strict": true,
-    "lib": ["ES2020", "dom"]
+    "lib": ["es6", "dom"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
   "exclude": ["node_modules"]

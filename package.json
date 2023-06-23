@@ -1,6 +1,6 @@
 {
   "name": "eth-graph-query",
-  "version": "1.0.7",
+  "version": "1.0.63",
   "description": "simple package for create query command to the GraphQL in ethereum",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -47,7 +47,6 @@
     "@commitlint/config-conventional": "^17.6.5",
     "@types/tape": "^5.6.0",
     "@typescript-eslint/eslint-plugin": "5.59.6",
-    "dotenv": "^16.1.4",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-alias": "^1.1.2",

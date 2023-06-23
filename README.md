@@ -80,9 +80,3 @@ Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/mai
 ```shell
 npm run test
 ```
-
-- Before running above command, you must create `.env` file
-
-```shell
-cp .env.example .env
-```

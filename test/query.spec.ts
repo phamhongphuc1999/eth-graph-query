@@ -1,16 +1,8 @@
 import * as tape from 'tape';
 import EthGraphQuery from '../src';
 
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('dotenv').config();
-} catch (error) {
-  console.error(error);
-}
-
 tape('Eth graph query', function (t) {
-  const root =
-    process.env.TEST_API_ROOT ?? 'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet';
+  const root = 'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet';
   const query = new EthGraphQuery(root);
   t.test('Test parameters', async function (st) {
     st.equal(query.root, root);
