@@ -1,6 +1,6 @@
-import { ElementType, GraphParams, Metadata, OptionKeys, OptionsKey, QueryJson, WhereOptions } from './type';
+import { ElementType, GraphParams, Metadata, OptionKeys, OptionsKey, QueryJson, WhereOptions } from './type.js';
 
-export default class QueryBuilder {
+export class QueryBuilder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static isWhereOptions(data: any) {
     const keys = Object.keys(data);

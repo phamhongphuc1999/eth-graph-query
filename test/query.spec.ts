@@ -1,5 +1,6 @@
+/* eslint-disable import/no-unresolved */
 import * as tape from 'tape';
-import EthGraphQuery from '../src';
+import { EthGraphQuery } from '../src/index.js';
 
 tape('Eth graph query', function (t) {
   const root = 'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet';

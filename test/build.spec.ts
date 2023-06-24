@@ -1,6 +1,5 @@
 import * as tape from 'tape';
-import QueryBuilder from '../src/query-builder';
-import { QueryJson } from '../src/type';
+import { QueryBuilder, QueryJson } from '../src/index.js';
 
 const simpleWhereQuery: QueryJson = {
   key1: 'a',

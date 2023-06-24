@@ -1,2 +1,2 @@
 #!/bin/sh
-rm -Rf ./dist* ./coverage
+rm -Rf ./dist* ./coverage *.tgz
