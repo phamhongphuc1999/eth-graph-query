@@ -1,5 +1,6 @@
-import * as tape from 'tape';
-import { QueryBuilder, QueryJson } from '../src/index.js';
+import { assert, describe, it } from 'vitest';
+import { QueryBuilder } from '../src/query-builder.js';
+import { QueryJson } from '../src/type.js';
 
 const simpleWhereQuery: QueryJson = {
   key1: 'a',
@@ -11,13 +12,12 @@ const simpleWhereQuery: QueryJson = {
   key7: { not_contains_nocase: 'starwar' },
 };
 
-tape('Build query', function (t) {
-  t.test('Build json query', function (st) {
+describe('Build query', () => {
+  it('Build json query', () => {
     const jsonQuery = QueryBuilder.buildJsonQuery(simpleWhereQuery);
-    st.ok(jsonQuery.length);
-    st.end();
+    assert.ok(jsonQuery.length);
   });
-  t.test('Build query', function (st) {
+  it('Build query', () => {
     const query = QueryBuilder.buildQuery(
       {
         collection: 'collection1',
@@ -37,11 +37,10 @@ tape('Build query', function (t) {
       { elements: ['deployment', 'number'], blockQuery: { hash: '0x123' } },
     );
     const fullQuery = QueryBuilder.makeFullQuery(query);
-    st.ok(query.length);
-    st.ok(fullQuery.length);
-    st.end();
+    assert.ok(query.length);
+    assert.ok(fullQuery.length);
   });
-  t.test('Merge query', function (st) {
+  it('Merge query', () => {
     const query = QueryBuilder.mergeQuery([
       {
         collection: 'collection1',
@@ -66,8 +65,68 @@ tape('Build query', function (t) {
       },
     ]);
     const fullQuery = QueryBuilder.makeFullQuery(query);
-    st.ok(query.length);
-    st.ok(fullQuery.length);
-    st.end();
+    assert.ok(query.length);
+    assert.ok(fullQuery.length);
   });
 });
+
+// tape('Build query', function (t) {
+//   t.test('Build json query', function (st) {
+//     const jsonQuery = QueryBuilder.buildJsonQuery(simpleWhereQuery);
+//     st.ok(jsonQuery.length);
+//     st.end();
+//   });
+//   t.test('Build query', function (st) {
+//     const query = QueryBuilder.buildQuery(
+//       {
+//         collection: 'collection1',
+//         params: {
+//           elements: ['element1', 'element2'],
+//           where: simpleWhereQuery,
+//           id: '123',
+//           orderBy: 'element1',
+//           orderDirection: 'asc',
+//           skip: 100,
+//           subgraphError: 'allow',
+//           block: {
+//             hash: '123456789',
+//           },
+//         },
+//       },
+//       { elements: ['deployment', 'number'], blockQuery: { hash: '0x123' } },
+//     );
+//     const fullQuery = QueryBuilder.makeFullQuery(query);
+//     st.ok(query.length);
+//     st.ok(fullQuery.length);
+//     st.end();
+//   });
+//   t.test('Merge query', function (st) {
+//     const query = QueryBuilder.mergeQuery([
+//       {
+//         collection: 'collection1',
+//         params: {
+//           elements: [
+//             'element1',
+//             'element2',
+//             { collection: 'collection3', params: { elements: ['element5', 'element6'] } },
+//           ],
+//           where: simpleWhereQuery,
+//           id: '123',
+//           orderBy: 'element1',
+//         },
+//       },
+//       {
+//         collection: 'collection2',
+//         params: {
+//           elements: ['element3', 'element4'],
+//           skip: 1000,
+//           block: { hash: '0x123', number: 1234 },
+//         },
+//       },
+//     ]);
+//     const fullQuery = QueryBuilder.makeFullQuery(query);
+//     st.ok(query.length);
+//     st.ok(fullQuery.length);
+//     st.end();
+//   });
+// });

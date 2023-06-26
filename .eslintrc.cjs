@@ -55,7 +55,7 @@ module.exports = {
           ['src', './src/'],
           ['public', './public/'],
         ],
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        extensions: ['.js', '.ts'],
       },
     },
   },
