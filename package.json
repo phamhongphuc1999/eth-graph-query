@@ -1,7 +1,8 @@
 {
   "name": "eth-graph-query",
-  "version": "1.0.63",
+  "version": "1.1.0",
   "description": "simple package for create query command to the GraphQL in ethereum",
+  "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "exports": {
@@ -12,18 +13,20 @@
   },
   "files": [
     "dist",
-    "src"
+    "package.json",
+    "README.md"
   ],
   "scripts": {
     "clean": "./scripts/clear-package.sh",
     "build": "./scripts/ts-build.sh",
     "prepare": "npm run build && husky install",
-    "tape": "tape -r ts-node/register",
-    "test:browser": "karma start karma.conf.js",
-    "test:node": "npm run tape -- test/*.spec.ts",
+    "test:browser": "npx vitest run --config=./vitest.config.browser.ts --browser.name=chrome --browser.headless",
+    "test:node": "npx vitest run",
     "test": "npm run test:node && npm run test:browser",
     "eslint": "eslint . --ext .ts",
-    "prepublish": "npm run clean && npm run build && npm run test"
+    "prepublish": "npm run clean && npm run build && npm run test",
+    "tsc": "./scripts/ts-compile.sh",
+    "example": "node --loader ts-node/esm examples/*"
   },
   "repository": {
     "type": "git",
@@ -45,24 +48,22 @@
   "devDependencies": {
     "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^17.6.5",
-    "@types/tape": "^5.6.0",
     "@typescript-eslint/eslint-plugin": "5.59.6",
+    "@vitest/browser": "^0.32.2",
+    "@vitest/coverage-v8": "^0.32.2",
+    "@vitest/ui": "^0.32.2",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
-    "karma": "^6.4.2",
-    "karma-chrome-launcher": "^3.2.0",
-    "karma-tap": "^4.2.0",
-    "karma-typescript": "^5.5.4",
-    "karma-typescript-es6-transform": "^5.5.4",
     "lint-staged": "^13.2.2",
     "prettier": "^2.8.8",
-    "tape": "^5.6.3",
     "ts-node": "10.9.1",
-    "typescript": "5.0.4"
+    "typescript": "4.7.4",
+    "vitest": "^0.32.2",
+    "webdriverio": "^8.10.7"
   },
   "contributors": [
     {
@@ -81,7 +82,7 @@
     ]
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --config ./.eslintrc-staged.js --cache --fix",
+    "*.{js,jsx,ts,tsx}": "eslint --config ./.eslintrc-staged.cjs --cache --fix",
     "*.{json,yml,md}": [
       "prettier --write"
     ]

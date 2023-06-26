@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import EthGraphQuery from '../src';
+import { EthGraphQuery } from '../src/index.js';
 
 async function run() {
   console.log('---Run examples/index.ts---');

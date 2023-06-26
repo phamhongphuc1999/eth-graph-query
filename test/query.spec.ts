@@ -1,19 +1,18 @@
-import * as tape from 'tape';
-import EthGraphQuery from '../src';
+import { assert, describe, it } from 'vitest';
+import { EthGraphQuery } from '../src';
 
-tape('Eth graph query', function (t) {
+describe('Eth graph query', () => {
   const root = 'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet';
   const query = new EthGraphQuery(root);
-  t.test('Test parameters', async function (st) {
-    st.equal(query.root, root);
-    st.end();
+
+  it('Test parameters', () => {
+    assert.equal(query.root, root);
   });
-  t.test('Test simple query', async function (st) {
+  it('Test simple query', async () => {
     const result = await query.query({ collection: 'pools', params: { first: 10 } });
-    st.equal(result['errors'], undefined);
-    st.end();
+    assert.equal(result['errors'], undefined);
   });
-  t.test('Test ethereum address query', async function (st) {
+  it('Test ethereum address query', async () => {
     const result = await query.query(
       {
         collection: 'pools',
@@ -32,10 +31,9 @@ tape('Eth graph query', function (t) {
         blockQuery: { hash: '0xa005448da8cfdf40d34ab6f81c0100e9faac6ab942b435e9a0150505ba31df44' },
       },
     );
-    st.equal(result['errors'], undefined);
-    st.end();
+    assert.equal(result['errors'], undefined);
   });
-  t.test('Test complex query', async function (st) {
+  it('Test complex query', async () => {
     const result = await query.mergeQuery([
       { collection: 'networks', params: { first: 10 } },
       {
@@ -59,7 +57,6 @@ tape('Eth graph query', function (t) {
         },
       },
     ]);
-    st.equal(result['errors'], undefined);
-    st.end();
+    assert.equal(result['errors'], undefined);
   });
 });
