@@ -56,7 +56,7 @@ const result1 = await query.mergeQuery([
         'element21',
         {
           collection: 'collection3',
-          params: { elements: ['element31'], where: { id: { in: ['123'] }, element31: 'element31' }, first: 50 },
+          params: { elements: ['element31'], where: { id: { $in: ['123'] }, element31: 'element31' }, first: 50 },
         },
       ],
       where: { element21: '123', collection3: { element31: '123' } },
@@ -69,14 +69,6 @@ const result1 = await query.mergeQuery([
 
 ### API
 
-Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/docs/api.md), you also read my [examples](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/examples)
+Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/documents/api.md), you also read my [examples](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/examples)
 
 ---
-
-### For develop
-
-- To test package, you can run below command
-
-```shell
-npm run test
-```

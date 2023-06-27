@@ -51,7 +51,7 @@ describe('Eth graph query', () => {
             },
           ],
           where: {
-            id: { lte: '10' },
+            id: { $lte: '10' },
           },
           first: 10,
         },
@@ -73,7 +73,7 @@ describe('Eth graph query', () => {
             },
           },
         ],
-        where: { id: { lte: 1, gte: 1 } },
+        where: { id: { $lte: 1, $gte: 1 } },
       },
     });
     assert.equal(result['errors'], undefined);

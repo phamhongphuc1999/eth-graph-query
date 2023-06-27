@@ -21,50 +21,30 @@ export const OptionKeys = [
   'in',
   'not_in',
 ];
-export type OptionsKey =
-  | 'contains'
-  | 'contains_nocase'
-  | 'ends_with'
-  | 'end_with_nocase'
-  | 'starts_with'
-  | 'starts_with_nocase'
-  | 'not_contains'
-  | 'not_contains_nocase'
-  | 'not_ends_with'
-  | 'not_ends_with_nocase'
-  | 'not_starts_with'
-  | 'not_starts_with_nocase'
-  | 'gt'
-  | 'gte'
-  | 'lt'
-  | 'lte'
-  | 'not'
-  | 'in'
-  | 'not_in';
 
 export type TextWhereOptions = {
-  contains?: BaseQueryType;
-  contains_nocase?: BaseQueryType;
-  ends_with?: BaseQueryType;
-  end_with_nocase?: BaseQueryType;
-  starts_with?: BaseQueryType;
-  starts_with_nocase?: BaseQueryType;
-  not_contains?: BaseQueryType;
-  not_contains_nocase?: BaseQueryType;
-  not_ends_with?: BaseQueryType;
-  not_ends_with_nocase?: BaseQueryType;
-  not_starts_with?: BaseQueryType;
-  not_starts_with_nocase?: BaseQueryType;
+  $contains?: BaseQueryType;
+  $contains_nocase?: BaseQueryType;
+  $ends_with?: BaseQueryType;
+  $end_with_nocase?: BaseQueryType;
+  $starts_with?: BaseQueryType;
+  $starts_with_nocase?: BaseQueryType;
+  $not_contains?: BaseQueryType;
+  $not_contains_nocase?: BaseQueryType;
+  $not_ends_with?: BaseQueryType;
+  $not_ends_with_nocase?: BaseQueryType;
+  $not_starts_with?: BaseQueryType;
+  $not_starts_with_nocase?: BaseQueryType;
 };
 
 export type CommonWhereOptions = {
-  gt?: BaseQueryType;
-  gte?: BaseQueryType;
-  lt?: BaseQueryType;
-  lte?: BaseQueryType;
-  not?: BaseQueryType;
-  in?: BaseQueryType;
-  not_in?: BaseQueryType;
+  $gt?: BaseQueryType;
+  $gte?: BaseQueryType;
+  $lt?: BaseQueryType;
+  $lte?: BaseQueryType;
+  $not?: BaseQueryType;
+  $in?: BaseQueryType;
+  $not_in?: BaseQueryType;
 };
 
 export type WhereOptions = TextWhereOptions & CommonWhereOptions;

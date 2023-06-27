@@ -2,7 +2,7 @@
 eth-graph-query
 </h1>
 
-The idea when create this package is trying to use `Json format` for create query with `string format` to [the graph](https://thegraph.com/)
+The idea when create this package is trying to use `Json format` for creating a query with `string format` to [the graph](https://thegraph.com/)
 
 ---
 
@@ -71,7 +71,7 @@ const result = await query.query({
   collection: 'collection1',
   params: {
     elements: ['element1', 'element2'],
-    where: { element1: '1234', id: { in: ['0x1234', '0x4321'] } },
+    where: { element1: '1234', id: { $in: ['0x1234', '0x4321'] } },
   },
 });
 ```

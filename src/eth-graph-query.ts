@@ -22,7 +22,7 @@ export class EthGraphQuery extends NormalQuery {
    * @param {string} query A query string containing all data you want to fetch
    * @returns The data respective with the query string
    */
-  async _fetch<T>(query: string): Promise<T> {
+  private async _fetch<T>(query: string): Promise<T> {
     return await this.post<{ query: string }, T>('', { query: query });
   }
 

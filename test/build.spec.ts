@@ -8,14 +8,14 @@ const simpleWhereQuery: QueryJson = {
   key3: { sub31: 'abc', sub32: 321 },
   key4: true,
   key5: ['1', '2', '3'],
-  key6: { contains: 'abc', not: 123 },
-  key7: { not_contains_nocase: 'starwar' },
+  key6: { $contains: 'abc', $not: 123 },
+  key7: { $not_contains_nocase: 'starwar' },
 };
 
 describe('Build query', () => {
   it('Build json query', () => {
     const jsonQuery = QueryBuilder.buildJsonQuery(simpleWhereQuery);
-    assert.ok(jsonQuery.length);
+    assert.notOk(jsonQuery.includes('{}'));
     assert.ok(jsonQuery.includes('key7_not_contains_nocase'));
     assert.ok(jsonQuery.includes('key6_contains'));
     assert.ok(jsonQuery.includes('key6_not'));
@@ -40,8 +40,9 @@ describe('Build query', () => {
       { elements: ['deployment', 'number'], blockQuery: { hash: '0x123' } },
     );
     const fullQuery = QueryBuilder.makeFullQuery(query);
-    assert.ok(query.length);
-    assert.ok(fullQuery.length);
+    assert.notOk(query.includes('{}'));
+    assert.ok(query.includes('["1", "2", "3"]'));
+    assert.ok(fullQuery.includes('query query'));
   });
   it('Merge query', () => {
     const query = QueryBuilder.mergeQuery([
@@ -68,7 +69,15 @@ describe('Build query', () => {
       },
     ]);
     const fullQuery = QueryBuilder.makeFullQuery(query);
-    assert.ok(query.length);
-    assert.ok(fullQuery.length);
+    assert.notOk(query.includes('{}'));
+    assert.ok(fullQuery.includes('query query'));
+  });
+  it('Array with $in', () => {
+    const query = QueryBuilder.buildQuery({
+      collection: 'collection1',
+      params: { elements: ['id'], where: { id: { $in: ['0x123', '0x456'] }, element1: { $lte: 3 } } },
+    });
+    assert.notOk(query.includes('{}'));
+    assert.ok(query.includes('["0x123", "0x456"]'));
   });
 });

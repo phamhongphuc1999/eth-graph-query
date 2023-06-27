@@ -1,16 +1,6 @@
-import { ElementType, GraphParams, Metadata, OptionKeys, OptionsKey, QueryJson, WhereOptions } from './type.js';
+import { ElementType, GraphParams, Metadata, OptionKeys, QueryJson, WhereOptions } from './type.js';
 
 export class QueryBuilder {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static isWhereOptions(data: any) {
-    const keys = Object.keys(data);
-    if (keys.length == 0) return false;
-    for (const key of keys) {
-      if (!OptionKeys.includes(key)) return false;
-    }
-    return true;
-  }
-
   /**
    * Create a query string from a query with json format.
    * @param {QueryJson} query the json format query
@@ -23,16 +13,23 @@ export class QueryBuilder {
         if (Array.isArray(query[key])) {
           const queryArray = query[key] as Array<string>;
           whereList.push(`${key}: [${queryArray.map((item) => `"${item}"`).join(', ')}]`);
-        } else if (this.isWhereOptions(query[key])) {
-          const realJson: QueryJson = {};
-          const options = query[key] as WhereOptions;
-          for (const option in options) {
-            const value = options[option as OptionsKey];
-            if (value) realJson[`${key}_${option}`] = value;
-          }
-          whereList.push(`${this.buildJsonQuery(realJson as QueryJson)}`);
         } else if (typeof query[key] == 'object') {
-          whereList.push(`${key}: {${this.buildJsonQuery(query[key] as QueryJson)}}`);
+          const normalJson: QueryJson = {};
+          const operatorJson: QueryJson = {};
+          const options = query[key] as { [key: string]: QueryJson | WhereOptions };
+          for (const option in options) {
+            const value = options[option];
+            if (option.length == 1) normalJson[option] = value;
+            else {
+              if (option[0] == '$') {
+                const realOperator = option.slice(1);
+                if (OptionKeys.includes(realOperator)) operatorJson[`${key}_${realOperator}`] = value;
+              } else normalJson[option] = value;
+            }
+          }
+          if (Object.keys(normalJson).length > 0)
+            whereList.push(`${key}: {${this.buildJsonQuery(normalJson as QueryJson)}}`);
+          if (Object.keys(operatorJson).length > 0) whereList.push(this.buildJsonQuery(operatorJson as QueryJson));
         } else if (typeof query[key] == 'string') {
           whereList.push(`${key}: "${query[key]}"`);
         } else whereList.push(`${key}: ${query[key]}`);
