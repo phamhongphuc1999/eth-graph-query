@@ -4,7 +4,7 @@ export class QueryBuilder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static isWhereOptions(data: any) {
     const keys = Object.keys(data);
-    if (keys.length == 0) return true;
+    if (keys.length == 0) return false;
     for (const key of keys) {
       if (!OptionKeys.includes(key)) return false;
     }
@@ -31,10 +31,11 @@ export class QueryBuilder {
             if (value) realJson[`${key}_${option}`] = value;
           }
           whereList.push(`${this.buildJsonQuery(realJson as QueryJson)}`);
-        } else if (typeof query[key] == 'object')
+        } else if (typeof query[key] == 'object') {
           whereList.push(`${key}: {${this.buildJsonQuery(query[key] as QueryJson)}}`);
-        else if (typeof query[key] == 'string') whereList.push(`${key}: "${query[key]}"`);
-        else whereList.push(`${key}: ${query[key]}`);
+        } else if (typeof query[key] == 'string') {
+          whereList.push(`${key}: "${query[key]}"`);
+        } else whereList.push(`${key}: ${query[key]}`);
       }
     }
     return whereList.join(', ');

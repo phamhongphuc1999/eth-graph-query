@@ -4,7 +4,7 @@ import { EthGraphQuery } from '../src/index.js';
 async function run() {
   console.log('---Run examples/index.ts---');
   const query = new EthGraphQuery('https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet');
-  const result = await query.mergeQuery([
+  const result1 = await query.mergeQuery([
     { collection: 'networks', params: { first: 10 } },
     {
       collection: 'pools',
@@ -27,7 +27,25 @@ async function run() {
       },
     },
   ]);
-  console.log(result);
+  console.log(result1);
+
+  const result2 = await query.query({
+    collection: 'pools',
+    params: {
+      elements: [
+        'id',
+        {
+          collection: 'closedAllocations',
+          params: {
+            elements: ['id', 'closedAtBlockNumber'],
+            first: 1,
+          },
+        },
+      ],
+      where: { id: { lte: 1, gte: 1 } },
+    },
+  });
+  console.log(result2);
 }
 
 run();

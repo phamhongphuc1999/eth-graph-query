@@ -59,4 +59,26 @@ describe('Eth graph query', () => {
     ]);
     assert.equal(result['errors'], undefined);
   });
+  it('Test more detail situation', async () => {
+    const result = await query.query({
+      collection: 'pools',
+      params: {
+        elements: [
+          'id',
+          {
+            collection: 'closedAllocations',
+            params: {
+              elements: ['id', 'closedAtBlockNumber'],
+              first: 1,
+            },
+          },
+        ],
+        where: { id: { lte: 1, gte: 1 } },
+      },
+    });
+    assert.equal(result['errors'], undefined);
+    assert.ok(result['data']);
+    assert.ok(result['data']['pools']);
+    assert.ok(result['data']['pools'].length == 0);
+  });
 });

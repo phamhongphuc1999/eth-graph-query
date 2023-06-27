@@ -16,6 +16,9 @@ describe('Build query', () => {
   it('Build json query', () => {
     const jsonQuery = QueryBuilder.buildJsonQuery(simpleWhereQuery);
     assert.ok(jsonQuery.length);
+    assert.ok(jsonQuery.includes('key7_not_contains_nocase'));
+    assert.ok(jsonQuery.includes('key6_contains'));
+    assert.ok(jsonQuery.includes('key6_not'));
   });
   it('Build query', () => {
     const query = QueryBuilder.buildQuery(
