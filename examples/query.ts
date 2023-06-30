@@ -21,7 +21,7 @@ async function run() {
           },
         ],
         where: {
-          id: { lte: '10' },
+          id: { $lte: '10' },
         },
         first: 10,
       },
@@ -42,7 +42,7 @@ async function run() {
           },
         },
       ],
-      where: { id: { lte: 1, gte: 1 } },
+      where: { id: { $lte: 1, $gte: 1 } },
     },
   });
   console.log(result2);

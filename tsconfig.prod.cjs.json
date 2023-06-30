@@ -3,7 +3,9 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist/cjs",
-    "composite": true
+    "composite": true,
+    "target": "es6",
+    "module": "CommonJS"
   },
   "include": ["src"]
 }

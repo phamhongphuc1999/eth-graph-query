@@ -9,8 +9,14 @@ describe('Eth graph query', () => {
     assert.equal(query.root, root);
   });
   it('Test simple query', async () => {
-    const result = await query.query({ collection: 'pools', params: { first: 10 } });
+    let result = await query.query({ collection: 'pools', params: { first: 10 } });
     assert.equal(result['errors'], undefined);
+    result = await query.fetch(`query MyQuery {
+      pools(first: 10) {
+        id
+      }
+    }`);
+    assert.equal(result['error'], undefined);
   });
   it('Test ethereum address query', async () => {
     const result = await query.query(

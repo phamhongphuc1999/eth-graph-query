@@ -22,7 +22,7 @@ export class EthGraphQuery extends NormalQuery {
    * @param {string} query A query string containing all data you want to fetch
    * @returns The data respective with the query string
    */
-  private async _fetch<T>(query: string): Promise<T> {
+  async fetch<T>(query: string): Promise<T> {
     return await this.post<{ query: string }, T>('', { query: query });
   }
 
@@ -36,7 +36,7 @@ export class EthGraphQuery extends NormalQuery {
    */
   async query<T = any>(data: { collection: string; params?: GraphParams }, metadata?: Metadata): Promise<T> {
     const sQuery = QueryBuilder.buildQuery({ collection: data.collection, params: data.params }, metadata);
-    return await this._fetch<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+    return await this.fetch<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
   }
 
   /**
@@ -50,6 +50,6 @@ export class EthGraphQuery extends NormalQuery {
     metadata?: Metadata,
   ): Promise<T> {
     const sQuery = QueryBuilder.mergeQuery(data, metadata);
-    return await this._fetch<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+    return await this.fetch<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
   }
 }

@@ -29,26 +29,58 @@ yarn add eth-graph-query
 const query = new EthGraphQuery(root);
 ```
 
-- This package has two query options. To create simple query
+- This package has three query options. Simply, you can create a direct string query
 
 ```js
-const result = await query.query({ collection: 'collection1', params: { elements: ['element1', 'element2'] } });
+result = await query.fetch(`query query {
+  collection1(first: 10) {
+    element1
+    element2
+  }
+}`);
 ```
 
-- To create a multiple query
+- More readable, you can create a single json query
+
+```js
+const result = await query.query({
+  collection: 'collection1',
+  params: {
+    elements: ['element1', 'element2'],
+  },
+});
+```
+
+- You can create a multiple json queries
 
 ```js
 const result = await query.mergeQuery([
-  { collection: 'collection1', params: { elements: ['element11', 'element12'] } },
-  { collection: 'collection2', params: { elements: ['element21', 'element22'] } },
+  {
+    collection: 'collection1',
+    params: {
+      elements: ['element11', 'element12'],
+    },
+  },
+  {
+    collection: 'collection2',
+    params: {
+      elements: ['element21', 'element22'],
+    },
+  },
 ]);
 ```
 
 - You can create a complex query
 
 ```js
-const result1 = await query.mergeQuery([
-  { collection: 'collection1', params: { elements: ['element11', 'element12'], where: { element11: 'abc' } } },
+const result = await query.mergeQuery([
+  {
+    collection: 'collection1',
+    params: {
+      elements: ['element11', 'element12'],
+      where: { element11: 'abc' },
+    },
+  },
   {
     collection: 'collection2',
     params: {
@@ -56,10 +88,17 @@ const result1 = await query.mergeQuery([
         'element21',
         {
           collection: 'collection3',
-          params: { elements: ['element31'], where: { id: { $in: ['123'] }, element31: 'element31' }, first: 50 },
+          params: {
+            elements: ['element31'],
+            where: { id: { $in: ['123'] }, element31: 'element31' },
+            first: 50,
+          },
         },
       ],
-      where: { element21: '123', collection3: { element31: '123' } },
+      where: {
+        element21: '123',
+        collection3: { element31: '123' },
+      },
     },
   },
 ]);
@@ -72,3 +111,17 @@ const result1 = await query.mergeQuery([
 Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/documents/api.md), you also read my [examples](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/examples)
 
 ---
+
+### For developer
+
+- Run example
+
+```shell
+npm run example example/file-name
+```
+
+- Run test
+
+```shell
+npm run test
+```

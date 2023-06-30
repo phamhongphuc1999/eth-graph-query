@@ -10,6 +10,7 @@ The idea when create this package is trying to use `Json format` for creating a 
 
 - [EthGraphQuery](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/index.ts)
 
+  - async fetch<T>(query: string): Given query string, returns the data respective with it.
   - async query<T = any>(data: { collection: string; params?: [GraphParams](#graph_params) }, metadata?: [Metadata](#metadata)): fetch data with a single query
   - async mergeQuery<T = any>(data: Array<{ collection: string; params?: [GraphParams](#graph_params) }>, metadata?: [Metadata](#metadata)): fetch data with a multiple query
 

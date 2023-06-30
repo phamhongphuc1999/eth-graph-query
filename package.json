@@ -1,6 +1,6 @@
 {
   "name": "eth-graph-query",
-  "version": "1.1.2",
+  "version": "1.1.21",
   "description": "simple package for create query command to the GraphQL in ethereum",
   "type": "module",
   "main": "dist/cjs/index.js",
@@ -27,7 +27,7 @@
     "eslint": "eslint . --ext .ts",
     "prepublishOnly": "npm run clean && npm run build && npm run test",
     "tsc": "./scripts/ts-compile.sh",
-    "example": "node --loader ts-node/esm examples/*"
+    "example": "node --loader ts-node/esm"
   },
   "repository": {
     "type": "git",
