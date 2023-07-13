@@ -44,6 +44,22 @@ describe('Build query', () => {
     assert.ok(query.includes('["1", "2", "3"]'));
     assert.ok(fullQuery.includes('query query'));
   });
+  it('Build wih inline fragments', () => {
+    const query = QueryBuilder.buildQuery({
+      collection: 'networks',
+      params: {
+        elements: ['element1', 'element2'],
+        inlineFragments: [
+          { collection: 'inline1', params: { elements: ['inline11', 'inline12'] } },
+          { collection: 'inline2', params: { elements: ['inline21', 'inline22'] } },
+        ],
+      },
+    });
+    const fullQuery = QueryBuilder.makeFullQuery(query);
+    assert.notOk(query.includes('{}'));
+    assert.ok(query.includes('... on'));
+    assert.ok(fullQuery.includes('query query'));
+  });
   it('Merge query', () => {
     const query = QueryBuilder.mergeQuery([
       {
@@ -75,7 +91,10 @@ describe('Build query', () => {
   it('Array with $in', () => {
     const query = QueryBuilder.buildQuery({
       collection: 'collection1',
-      params: { elements: ['id'], where: { id: { $in: ['0x123', '0x456'] }, element1: { $lte: 3 } } },
+      params: {
+        elements: ['id'],
+        where: { id: { $in: ['0x123', '0x456'] }, element1: { $lte: 3 } },
+      },
     });
     assert.notOk(query.includes('{}'));
     assert.ok(query.includes('["0x123", "0x456"]'));

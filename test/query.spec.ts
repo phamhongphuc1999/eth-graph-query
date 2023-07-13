@@ -16,27 +16,34 @@ describe('Eth graph query', () => {
         id
       }
     }`);
-    assert.equal(result['error'], undefined);
+    assert.equal(result['errors'], undefined);
   });
   it('Test ethereum address query', async () => {
-    const result = await query.query(
-      {
-        collection: 'pools',
-        params: {
-          elements: [
-            'id',
-            {
-              collection: 'closedAllocations',
-              params: { where: { id: '0x02353e9c1d14fe8e3eccf316fe6dde4aaf43cf58' } },
-            },
-          ],
-        },
+    const result = await query.query({
+      collection: 'pools',
+      params: {
+        elements: [
+          'id',
+          {
+            collection: 'closedAllocations',
+            params: { where: { id: '0x02353e9c1d14fe8e3eccf316fe6dde4aaf43cf58' } },
+          },
+        ],
       },
-      {
-        elements: ['hash'],
-        blockQuery: { hash: '0xa005448da8cfdf40d34ab6f81c0100e9faac6ab942b435e9a0150505ba31df44' },
+    });
+    assert.equal(result['errors'], undefined);
+  });
+  it('Test query with inline fragments', async () => {
+    const result = await query.query({
+      collection: 'transactions',
+      params: {
+        elements: ['id'],
+        inlineFragments: [
+          { collection: 'BridgeDepositTransaction', params: { elements: ['id', 'l1Token'] } },
+          { collection: 'NameSignalTransaction', params: { elements: ['id', 'timestamp'] } },
+        ],
       },
-    );
+    });
     assert.equal(result['errors'], undefined);
   });
   it('Test complex query', async () => {
@@ -51,7 +58,11 @@ describe('Eth graph query', () => {
             {
               collection: 'closedAllocations',
               params: {
-                elements: ['id', 'poi', { collection: 'indexer', params: { elements: ['id'], first: 10 } }],
+                elements: [
+                  'id',
+                  'poi',
+                  { collection: 'indexer', params: { elements: ['id'], first: 10 } },
+                ],
                 first: 10,
               },
             },

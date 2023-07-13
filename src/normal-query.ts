@@ -13,22 +13,32 @@ export class NormalQuery {
 
   constructor(rootUrl: string, config?: AxiosRequestConfig) {
     this.root = rootUrl;
-    this.config = config ? { ...config, ...{ headers: defaultHeader } } : { headers: defaultHeader };
+    this.config = config
+      ? { ...config, ...{ headers: defaultHeader } }
+      : { headers: defaultHeader };
   }
 
   protected async get<T = any>(url: string, config?: AxiosRequestConfig) {
-    return await axios.get(`${this.root}${url}`, { ...config, ...this.config }).then<T>(responseBody);
+    return await axios
+      .get(`${this.root}${url}`, { ...config, ...this.config })
+      .then<T>(responseBody);
   }
 
   protected async post<B = any, T = any>(url: string, data?: B, config?: AxiosRequestConfig) {
-    return await axios.post(`${this.root}${url}`, data, { ...config, ...this.config }).then<T>(responseBody);
+    return await axios
+      .post(`${this.root}${url}`, data, { ...config, ...this.config })
+      .then<T>(responseBody);
   }
 
   protected async put<B = any, T = any>(url: string, data?: B, config?: AxiosRequestConfig) {
-    return await axios.put(`${this.root}${url}`, data, { ...config, ...this.config }).then<T>(responseBody);
+    return await axios
+      .put(`${this.root}${url}`, data, { ...config, ...this.config })
+      .then<T>(responseBody);
   }
 
   protected async del<T = any>(url: string, config?: AxiosRequestConfig) {
-    return await axios.delete(`${this.root}${url}`, { ...config, ...this.config }).then<T>(responseBody);
+    return await axios
+      .delete(`${this.root}${url}`, { ...config, ...this.config })
+      .then<T>(responseBody);
   }
 }

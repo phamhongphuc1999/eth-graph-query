@@ -11,7 +11,7 @@ function run() {
     key6: { $contains: 'abc', $not: 123 },
     key7: { $not_contains_nocase: 'starwar' },
   });
-  console.log(result1);
+  console.log('result1', result1);
   console.log('=======');
   const result2 = QueryBuilder.mergeQuery([
     { collection: 'networks', params: { first: 10 } },
@@ -24,7 +24,11 @@ function run() {
           {
             collection: 'closedAllocations',
             params: {
-              elements: ['id', 'poi', { collection: 'indexer', params: { elements: ['id'], first: 10 } }],
+              elements: [
+                'id',
+                'poi',
+                { collection: 'indexer', params: { elements: ['id'], first: 10 } },
+              ],
               first: 10,
             },
           },
@@ -36,7 +40,19 @@ function run() {
       },
     },
   ]);
-  console.log(result2);
+  console.log('result2', result2);
+  console.log('=======');
+  const result3 = QueryBuilder.buildQuery({
+    collection: 'transactions',
+    params: {
+      elements: ['id'],
+      inlineFragments: [
+        { collection: 'BridgeDepositTransaction', params: { elements: ['id', 'l1Token'] } },
+        { collection: 'NameSignalTransaction', params: { elements: ['id', 'timestamp'] } },
+      ],
+    },
+  });
+  console.log('result3', result3);
 }
 
 run();

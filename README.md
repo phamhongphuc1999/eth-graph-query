@@ -125,3 +125,7 @@ npm run example example/file-name
 ```shell
 npm run test
 ```
+
+### Reference
+
+- https://spec.graphql.org

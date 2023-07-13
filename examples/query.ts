@@ -3,7 +3,9 @@ import { EthGraphQuery } from '../src/index.js';
 
 async function run() {
   console.log('---Run examples/index.ts---');
-  const query = new EthGraphQuery('https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet');
+  const query = new EthGraphQuery(
+    'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet',
+  );
   const result1 = await query.mergeQuery([
     { collection: 'networks', params: { first: 10 } },
     {
@@ -15,7 +17,11 @@ async function run() {
           {
             collection: 'closedAllocations',
             params: {
-              elements: ['id', 'poi', { collection: 'indexer', params: { elements: ['id'], first: 10 } }],
+              elements: [
+                'id',
+                'poi',
+                { collection: 'indexer', params: { elements: ['id'], first: 10 } },
+              ],
               first: 10,
             },
           },

@@ -1,4 +1,13 @@
-import { ElementType, GraphParams, Metadata, OptionKeys, QueryJson, WhereOptions } from './type.js';
+import {
+  ElementType,
+  GraphObject,
+  GraphParams,
+  InlineFragmentType,
+  Metadata,
+  OptionKeys,
+  QueryJson,
+  WhereOptions,
+} from './type.js';
 
 export class QueryBuilder {
   /**
@@ -23,13 +32,15 @@ export class QueryBuilder {
             else {
               if (option[0] == '$') {
                 const realOperator = option.slice(1);
-                if (OptionKeys.includes(realOperator)) operatorJson[`${key}_${realOperator}`] = value;
+                if (OptionKeys.includes(realOperator))
+                  operatorJson[`${key}_${realOperator}`] = value;
               } else normalJson[option] = value;
             }
           }
           if (Object.keys(normalJson).length > 0)
             whereList.push(`${key}: {${this.buildJsonQuery(normalJson as QueryJson)}}`);
-          if (Object.keys(operatorJson).length > 0) whereList.push(this.buildJsonQuery(operatorJson as QueryJson));
+          if (Object.keys(operatorJson).length > 0)
+            whereList.push(this.buildJsonQuery(operatorJson as QueryJson));
         } else if (typeof query[key] == 'string') {
           whereList.push(`${key}: "${query[key]}"`);
         } else whereList.push(`${key}: ${query[key]}`);
@@ -66,7 +77,8 @@ export class QueryBuilder {
     if (metadata.blockQuery) {
       if (metadata.blockQuery.hash) blockQuery.push(`hash: "${metadata.blockQuery.hash}"`);
       if (metadata.blockQuery.number) blockQuery.push(`number: ${metadata.blockQuery.number}`);
-      if (metadata.blockQuery.number_gte) blockQuery.push(`number_gte: ${metadata.blockQuery.number_gte}`);
+      if (metadata.blockQuery.number_gte)
+        blockQuery.push(`number_gte: ${metadata.blockQuery.number_gte}`);
     }
     const sBlockQuery = blockQuery.join(', ');
     if (sBlockQuery.length > 0) result += `(block: {${sBlockQuery}})`;
@@ -90,45 +102,80 @@ export class QueryBuilder {
     return result.length > 0 ? `_meta${result}` : '';
   }
 
+  private static _buildInlineFragment(fragment: InlineFragmentType): string {
+    let elements = ['id'];
+    if (fragment.params?.elements) elements = this.buildElements(fragment.params.elements);
+    return `... on ${fragment.collection}{${elements.join(' ')}}`;
+  }
+
+  /**
+   * Given a instance of Array<{@link InlineFragmentType}>, returns the string represent the inline fragments you want to query
+   * @param {Array<InlineFragmentType>} fragments The instance represent the inline fragments you want to query
+   * @returns The string represent the inline fragments you want to query
+   */
+  static buildInlineFragments(fragments: Array<InlineFragmentType>): string {
+    const result = [];
+    for (const fragment of fragments) {
+      result.push(this._buildInlineFragment(fragment));
+    }
+    return result.join(' ');
+  }
+
   /**
    * Given json data, returns the string query. This function only can create a string query for a particular collection.
-   * @param {{ collection: string; params?: GraphParams }} data An data for create query, contains two elements:
+   * @param {GraphObject} data An data for create query, contains two elements:
    *   1. collection: string - collection name
    *   2. params: GraphParams | undefined - If it is defined, it create a query to the collection
    * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
    * @returns The string query
    */
-  static buildQuery(data: { collection: string; params?: GraphParams }, metadata?: Metadata): string {
+  static buildQuery(data: GraphObject, metadata?: Metadata): string {
     const collection = data.collection;
     const params = data.params;
     const filters: Array<string> = [];
+    // build id
     if (params?.id != undefined) filters.push(`id: ${params.id}`);
+    // build order
     if (params?.orderBy) filters.push(`orderBy: ${params.orderBy}`);
+    // build order direction
     if (params?.orderDirection) filters.push(`orderDirection: ${params.orderDirection}`);
+    //build first
     if (params?.first != undefined) {
       if (params.first < 0) params.first = 0;
       else if (params.first > 1000) params.first = 1000;
       filters.push(`first: ${params.first}`);
     }
+    // build skip
     if (params?.skip != undefined) {
       if (params.skip < 0) params.skip = 0;
       else if (params.skip > 5000) params.skip = 5000;
       filters.push(`skip: ${params.skip}`);
     }
+    // build where
     if (params?.where) {
       const sWhere = this.buildJsonQuery(params.where);
       if (sWhere.length > 0) filters.push(`where: {${sWhere}}`);
     }
+    // build block
     if (params?.block) {
       const sBlock = this.buildJsonQuery(params.block);
       if (sBlock.length > 0) filters.push(`block: {${sBlock}}`);
     }
     const filterString = filters.join(', ');
+    // build elements
     let elements: Array<string> = ['id'];
-    if (params?.elements) if (params.elements.length > 0) elements = this.buildElements(params.elements);
+    if (params?.elements)
+      if (params.elements.length > 0) elements = this.buildElements(params.elements);
+    // build inline fragments
+    let inlineFragments = '';
+    if (params?.inlineFragments)
+      if (params.inlineFragments.length > 0)
+        inlineFragments = this.buildInlineFragments(params.inlineFragments);
     let finalQuery = '';
-    if (filterString.length > 0) finalQuery = `${collection}(${filterString}) {${elements.join(' ')}}`;
-    else finalQuery = `${collection} {${elements.join(' ')}}`;
+    const sElements =
+      inlineFragments.length > 0 ? `${elements.join(' ')} ${inlineFragments}` : elements.join(' ');
+    if (filterString.length > 0) finalQuery = `${collection}(${filterString}) {${sElements}}`;
+    else finalQuery = `${collection} {${sElements}}`;
     if (metadata) {
       const sMetadata = this.buildMetadata(metadata);
       if (sMetadata.length > 0) return `${sMetadata} ${finalQuery}`;
@@ -139,13 +186,14 @@ export class QueryBuilder {
 
   /**
    * Given a array contain many json data, return a query string represent a query to all collections that is in a array.
-   * @param {Array<{ collection: string; params?: GraphParams }>} data An array contain data to query to many collections
+   * @param {Array<GraphObject>} data An array contain data to query to many collections
    * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
    * @returns The query string
    */
-  static mergeQuery(data: Array<{ collection: string; params?: GraphParams }>, metadata?: Metadata): string {
+  static mergeQuery(data: Array<GraphObject>, metadata?: Metadata): string {
     const queries: Array<string> = [];
-    for (const item of data) queries.push(this.buildQuery({ collection: item.collection, params: item.params }));
+    for (const item of data)
+      queries.push(this.buildQuery({ collection: item.collection, params: item.params }));
     const finalQuery = queries.join(' ');
     if (metadata) {
       const sMetadata = this.buildMetadata(metadata);

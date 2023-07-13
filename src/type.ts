@@ -57,10 +57,12 @@ export type Metadata = {
   blockQuery?: BlockQuery;
 };
 
-export type ElementType = string | { collection: string; params?: GraphParams };
+export type ElementType = string | GraphObject;
+export type InlineFragmentType = { collection: string; params?: Pick<GraphParams, 'elements'> };
 
 export interface GraphParams {
   elements?: Array<ElementType>;
+  inlineFragments?: Array<InlineFragmentType>;
   where?: QueryJson;
   id?: string;
   first?: number;
@@ -69,4 +71,9 @@ export interface GraphParams {
   skip?: number;
   subgraphError?: 'allow' | 'deny';
   block?: BlockQuery;
+}
+
+export interface GraphObject {
+  collection: string;
+  params?: GraphParams;
 }
