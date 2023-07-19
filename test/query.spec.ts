@@ -11,7 +11,7 @@ describe('Eth graph query', () => {
   it('Test simple query', async () => {
     let result = await query.query({ collection: 'pools', params: { first: 10 } });
     assert.equal(result['errors'], undefined);
-    result = await query.fetch(`query MyQuery {
+    result = await query.query(`query MyQuery {
       pools(first: 10) {
         id
       }
@@ -47,7 +47,7 @@ describe('Eth graph query', () => {
     assert.equal(result['errors'], undefined);
   });
   it('Test complex query', async () => {
-    const result = await query.mergeQuery([
+    const result = await query.query([
       { collection: 'networks', params: { first: 10 } },
       {
         collection: 'pools',

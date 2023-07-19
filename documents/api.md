@@ -10,21 +10,32 @@ The idea when create this package is trying to use `Json format` for creating a 
 
 - [EthGraphQuery](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/index.ts)
 
-  - async fetch<T>(query: string): Given query string, returns the data respective with it.
-  - async query<T = any>(data: { collection: string; params?: [GraphParams](#graph_params) }, metadata?: [Metadata](#metadata)): fetch data with a single query
-  - async mergeQuery<T = any>(data: Array<{ collection: string; params?: [GraphParams](#graph_params) }>, metadata?: [Metadata](#metadata)): fetch data with a multiple query
+  - async query<T>(data: string): Given query string, returns the data respective with it.
+  - async query<T = any>(data: [GraphObject](#graphobject), metadata?: [Metadata](#metadata)): fetch data with a single query
+  - async query<T = any>(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): fetch data with a multiple query
 
 - static [QueryBuilder](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/query-builder.ts)
   - buildJsonQuery(query: [QueryJson](#query_json)): build json string format
   - buildElements(elements: Array<[ElementType](#element_type)>): build elements array string format
   - static buildMetadata(metadata: [Metadata](#metadata)): build metadata
-  - buildQuery(data: { collection: string; params?: [GraphParams](#graph_params) }, metadata?: [Metadata](#metadata)): build a single query
-  - mergeQuery(data: Array<{ collection: string; params?: [GraphParams](#graph_params) }>, metadata?: [Metadata](#metadata)): build a multiple query
+  - buildQuery(data: [GraphObject](#graphobject), metadata?: [Metadata](#metadata)): build a single query
+  - buildQuery(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): build a multiple query
   - makeFullQuery(query: string): create final query
 
 ---
 
 ### API
+
+#### GraphObject <a name="graphobject"></a>
+
+- Package graph params, it is a simple json format with two elements
+
+```shell
+{
+  collection: string;
+  params?: GraphParams;
+}
+```
 
 #### GraphParams <a name="graph_params"></a>
 
@@ -106,3 +117,5 @@ const result = await query.query({
 - `BlockQuery` is block query of graph query. If you define it, you can get the data in a particular block number or block hash.
 
 #### Metadata <a name="metadata"></a>
+
+- `Metadata` is metadata you can query in a query command.

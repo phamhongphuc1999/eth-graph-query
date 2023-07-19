@@ -22,9 +22,7 @@ export class EthGraphQuery extends NormalQuery {
    * @param {string} query A query string containing all data you want to fetch
    * @returns The data respective with the query string
    */
-  async fetch<T>(query: string): Promise<T> {
-    return await this.post<{ query: string }, T>('', { query: query });
-  }
+  async query<T>(data: string): Promise<T>;
 
   /**
    * Create a query to a particular collection, returns the data respective with the query data.
@@ -34,13 +32,7 @@ export class EthGraphQuery extends NormalQuery {
    * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
    * @returns The data respective with the query data
    */
-  async query<T = any>(data: GraphObject, metadata?: Metadata): Promise<T> {
-    const sQuery = QueryBuilder.buildQuery(
-      { collection: data.collection, params: data.params },
-      metadata,
-    );
-    return await this.fetch<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
-  }
+  async query<T = any>(data: GraphObject, metadata?: Metadata): Promise<T>;
 
   /**
    * Create a query to many collections, returns the data respective with the query data.
@@ -48,8 +40,22 @@ export class EthGraphQuery extends NormalQuery {
    * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
    * @returns The data respective with the query data
    */
-  async mergeQuery<T = any>(data: Array<GraphObject>, metadata?: Metadata): Promise<T> {
-    const sQuery = QueryBuilder.mergeQuery(data, metadata);
-    return await this.fetch<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+  async query<T = any>(data: Array<GraphObject>, metadata?: Metadata): Promise<T>;
+
+  async query<T = any>(
+    data: string | GraphObject | Array<GraphObject>,
+    metadata?: Metadata,
+  ): Promise<T> {
+    if (typeof data == 'string') return await this.post<{ query: string }, T>('', { query: data });
+    else if (Array.isArray(data)) {
+      const sQuery = QueryBuilder.buildQuery(data, metadata);
+      return await this.query<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+    } else {
+      const sQuery = QueryBuilder.buildQuery(
+        { collection: data.collection, params: data.params },
+        metadata,
+      );
+      return await this.query<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+    }
   }
 }

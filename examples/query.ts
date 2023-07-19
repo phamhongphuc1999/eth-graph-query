@@ -6,7 +6,7 @@ async function run() {
   const query = new EthGraphQuery(
     'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet',
   );
-  const result1 = await query.mergeQuery([
+  const result1 = await query.query([
     { collection: 'networks', params: { first: 10 } },
     {
       collection: 'pools',
