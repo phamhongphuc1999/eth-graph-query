@@ -92,11 +92,18 @@ describe('Build query', () => {
     const query = QueryBuilder.buildQuery({
       collection: 'collection1',
       params: {
-        elements: ['id'],
+        elements: [
+          'id',
+          {
+            collection: 'subCollection1',
+            params: { where: { buyer: null, token_: { setId: { $in: [0, 1, 2] } } } },
+          },
+        ],
         where: { id: { $in: ['0x123', '0x456'] }, element1: { $lte: 3 } },
       },
     });
     assert.notOk(query.includes('{}'));
+    assert.ok(query.includes('null'));
     assert.ok(query.includes('["0x123", "0x456"]'));
   });
 });

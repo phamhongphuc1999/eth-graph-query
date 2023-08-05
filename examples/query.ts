@@ -34,7 +34,7 @@ async function run() {
     },
   ]);
   console.log(result1);
-
+  console.log('=======');
   const result2 = await query.query({
     collection: 'pools',
     params: {

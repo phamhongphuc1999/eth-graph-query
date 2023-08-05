@@ -34,7 +34,10 @@ function run() {
           },
         ],
         where: {
+          buyer: null,
+          buyer1: undefined,
           id: { $lte: '10' },
+          token_: { setId: { $in: [1, '2', true] } },
         },
         first: 10,
       },

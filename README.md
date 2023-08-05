@@ -91,7 +91,11 @@ const result = await query.query([
           collection: 'collection3',
           params: {
             elements: ['element31'],
-            where: { id: { $in: ['123'] }, element31: 'element31' },
+            where: {
+              id: { $in: ['123'] },
+              token_: { setId: { $in: ['1', 2, true] } },
+              element31: 'element31',
+            },
             first: 50,
           },
         },
@@ -100,6 +104,16 @@ const result = await query.query([
         element21: '123',
         collection3: { element31: '123' },
       },
+      inlineFragments: [
+        {
+          collection: 'BridgeDepositTransaction',
+          params: { elements: ['id', 'l1Token'] },
+        },
+        {
+          collection: 'NameSignalTransaction',
+          params: { elements: ['id', 'timestamp'] },
+        },
+      ],
     },
   },
 ]);

@@ -18,10 +18,13 @@ export class QueryBuilder {
   static buildJsonQuery(query: QueryJson): string {
     const whereList = [];
     for (const key in query) {
-      if (query[key] != undefined) {
+      if (query[key] !== undefined) {
+        if (query[key] === null) whereList.push(`${key}: null`);
         if (Array.isArray(query[key])) {
-          const queryArray = query[key] as Array<string>;
+          const queryArray = query[key] as Array<string | number | boolean>;
           whereList.push(`${key}: [${queryArray.map((item) => `"${item}"`).join(', ')}]`);
+        } else if (typeof query[key] == 'string') {
+          whereList.push(`${key}: "${query[key]}"`);
         } else if (typeof query[key] == 'object') {
           const normalJson: QueryJson = {};
           const operatorJson: QueryJson = {};
@@ -41,8 +44,6 @@ export class QueryBuilder {
             whereList.push(`${key}: {${this.buildJsonQuery(normalJson as QueryJson)}}`);
           if (Object.keys(operatorJson).length > 0)
             whereList.push(this.buildJsonQuery(operatorJson as QueryJson));
-        } else if (typeof query[key] == 'string') {
-          whereList.push(`${key}: "${query[key]}"`);
         } else whereList.push(`${key}: ${query[key]}`);
       }
     }

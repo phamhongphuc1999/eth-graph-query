@@ -1,4 +1,10 @@
-type BaseQueryType = Array<string> | string | number | boolean | undefined;
+type BaseQueryType =
+  | Array<string | number | boolean>
+  | string
+  | number
+  | boolean
+  | null
+  | undefined;
 
 export const OptionKeys = [
   'contains',
