@@ -11,7 +11,7 @@ describe('Eth graph query', () => {
   it('Test simple query', async () => {
     let result = await query.query({ collection: 'pools', params: { first: 10 } });
     assert.equal(result['errors'], undefined);
-    result = await query.query(`query MyQuery {
+    result = await query.stringQuery(`query MyQuery {
       pools(first: 10) {
         id
       }
@@ -47,7 +47,7 @@ describe('Eth graph query', () => {
     assert.equal(result['errors'], undefined);
   });
   it('Test complex query', async () => {
-    const result = await query.query([
+    const result = await query.multipleQuery([
       { collection: 'networks', params: { first: 10 } },
       {
         collection: 'pools',
@@ -97,5 +97,17 @@ describe('Eth graph query', () => {
     assert.ok(result['data']);
     assert.ok(result['data']['pools']);
     assert.ok(result['data']['pools'].length == 0);
+  });
+  it('Test exception', async () => {
+    try {
+      await query.stringQuery(`query MyQuery {
+        pools 
+          allocation
+        }
+      }`);
+      assert.notOk(true);
+    } catch (error) {
+      assert.ok(error);
+    }
   });
 });

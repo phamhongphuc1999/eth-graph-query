@@ -2,7 +2,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { NormalQuery } from './normal-query.js';
 import { QueryBuilder } from './query-builder.js';
-import { GraphObject, Metadata } from './type.js';
+import { ErrorObject, GraphObject, Metadata } from './type.js';
 
 export class EthGraphQuery extends NormalQuery {
   queryName: string;
@@ -22,7 +22,14 @@ export class EthGraphQuery extends NormalQuery {
    * @param {string} query A query string containing all data you want to fetch
    * @returns The data respective with the query string
    */
-  async query<T>(data: string): Promise<T>;
+  async stringQuery<T = any>(data: string): Promise<T> {
+    const result = await this.post<{ query: string }, T | ErrorObject>('', { query: data });
+    if ((result as ErrorObject).errors) {
+      const _error = result as ErrorObject;
+      throw new Error(_error.errors[0].message);
+    }
+    return result as T;
+  }
 
   /**
    * Create a query to a particular collection, returns the data respective with the query data.
@@ -32,7 +39,14 @@ export class EthGraphQuery extends NormalQuery {
    * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
    * @returns The data respective with the query data
    */
-  async query<T = any>(data: GraphObject, metadata?: Metadata): Promise<T>;
+  async query<T = any>(data: GraphObject, metadata?: Metadata): Promise<T> {
+    const _data = data as GraphObject;
+    const sQuery = QueryBuilder.buildQuery(
+      { collection: _data.collection, params: _data.params },
+      metadata,
+    );
+    return await this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+  }
 
   /**
    * Create a query to many collections, returns the data respective with the query data.
@@ -40,22 +54,8 @@ export class EthGraphQuery extends NormalQuery {
    * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
    * @returns The data respective with the query data
    */
-  async query<T = any>(data: Array<GraphObject>, metadata?: Metadata): Promise<T>;
-
-  async query<T = any>(
-    data: string | GraphObject | Array<GraphObject>,
-    metadata?: Metadata,
-  ): Promise<T> {
-    if (typeof data == 'string') return await this.post<{ query: string }, T>('', { query: data });
-    else if (Array.isArray(data)) {
-      const sQuery = QueryBuilder.buildQuery(data, metadata);
-      return await this.query<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
-    } else {
-      const sQuery = QueryBuilder.buildQuery(
-        { collection: data.collection, params: data.params },
-        metadata,
-      );
-      return await this.query<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
-    }
+  async multipleQuery<T = any>(data: Array<GraphObject>, metadata?: Metadata): Promise<T> {
+    const sQuery = QueryBuilder.buildMultipleQuery(data, metadata);
+    return await this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
   }
 }

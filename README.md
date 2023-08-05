@@ -32,7 +32,7 @@ const query = new EthGraphQuery(root);
 - This package has three query options. Simply, you can create a direct string query
 
 ```js
-result = await query.query(`query query {
+result = await query.stringQuery(`query query {
   collection1(first: 10) {
     element1
     element2
@@ -55,7 +55,7 @@ const result = await query.query({
 - You can create a multiple json queries
 
 ```js
-const result = await query.query([
+const result = await query.multipleQuery([
   {
     collection: 'collection1',
     params: {
@@ -74,7 +74,7 @@ const result = await query.query([
 - You can create a complex query
 
 ```js
-const result = await query.query([
+const result = await query.multipleQuery([
   {
     collection: 'collection1',
     params: {

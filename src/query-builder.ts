@@ -61,9 +61,7 @@ export class QueryBuilder {
       if (typeof element == 'string') elementList.push(element);
       else {
         const object = element as { collection: string; params: GraphParams };
-        elementList.push(
-          this._buildQuery({ collection: object.collection, params: object.params }),
-        );
+        elementList.push(this.buildQuery({ collection: object.collection, params: object.params }));
       }
     }
     return elementList;
@@ -124,7 +122,15 @@ export class QueryBuilder {
     return result.join(' ');
   }
 
-  private static _buildQuery(data: GraphObject, metadata?: Metadata): string {
+  /**
+   * Given json data, returns the string query. This function only can create a string query for a particular collection.
+   * @param {GraphObject} data An data for create query, contains two elements:
+   *   1. collection: string - collection name
+   *   2. params: GraphParams | undefined - If it is defined, it create a query to the collection
+   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
+   * @returns The string query
+   */
+  static buildQuery(data: GraphObject, metadata?: Metadata): string {
     const collection = data.collection;
     const params = data.params;
     const filters: Array<string> = [];
@@ -179,10 +185,16 @@ export class QueryBuilder {
     return finalQuery;
   }
 
-  private static _buildMultipleQuery(data: Array<GraphObject>, metadata?: Metadata): string {
+  /**
+   * Given a array contain many json data, return a query string represent a query to all collections that is in a array.
+   * @param {Array<GraphObject>} data An array contain data to query to many collections
+   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
+   * @returns The query string
+   */
+  static buildMultipleQuery(data: Array<GraphObject>, metadata?: Metadata): string {
     const queries: Array<string> = [];
     for (const item of data)
-      queries.push(this._buildQuery({ collection: item.collection, params: item.params }));
+      queries.push(this.buildQuery({ collection: item.collection, params: item.params }));
     const finalQuery = queries.join(' ');
     if (metadata) {
       const sMetadata = this.buildMetadata(metadata);
@@ -190,29 +202,6 @@ export class QueryBuilder {
       else return finalQuery;
     }
     return finalQuery;
-  }
-
-  /**
-   * Given json data, returns the string query. This function only can create a string query for a particular collection.
-   * @param {GraphObject} data An data for create query, contains two elements:
-   *   1. collection: string - collection name
-   *   2. params: GraphParams | undefined - If it is defined, it create a query to the collection
-   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
-   * @returns The string query
-   */
-  static buildQuery(data: GraphObject, metadata?: Metadata): string;
-
-  /**
-   * Given a array contain many json data, return a query string represent a query to all collections that is in a array.
-   * @param {Array<GraphObject>} data An array contain data to query to many collections
-   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
-   * @returns The query string
-   */
-  static buildQuery(data: Array<GraphObject>, metadata?: Metadata): string;
-
-  static buildQuery(data: GraphObject | Array<GraphObject>, metadata?: Metadata): string {
-    if (Array.isArray(data)) return this._buildMultipleQuery(data, metadata);
-    else return this._buildQuery(data, metadata);
   }
 
   /**

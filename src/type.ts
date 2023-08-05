@@ -83,3 +83,7 @@ export interface GraphObject {
   collection: string;
   params?: GraphParams;
 }
+
+export type ErrorObject = {
+  errors: Array<{ message: string; locations: Array<unknown> }>;
+};

@@ -61,7 +61,7 @@ describe('Build query', () => {
     assert.ok(fullQuery.includes('query query'));
   });
   it('Merge query', () => {
-    const query = QueryBuilder.buildQuery([
+    const query = QueryBuilder.buildMultipleQuery([
       {
         collection: 'collection1',
         params: {

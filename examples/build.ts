@@ -13,7 +13,7 @@ function run() {
   });
   console.log('result1', result1);
   console.log('=======');
-  const result2 = QueryBuilder.buildQuery([
+  const result2 = QueryBuilder.buildMultipleQuery([
     { collection: 'networks', params: { first: 10 } },
     {
       collection: 'pools',

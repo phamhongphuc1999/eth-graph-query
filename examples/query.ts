@@ -6,7 +6,7 @@ async function run() {
   const query = new EthGraphQuery(
     'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet',
   );
-  const result1 = await query.query([
+  const result1 = await query.multipleQuery([
     { collection: 'networks', params: { first: 10 } },
     {
       collection: 'pools',
@@ -33,7 +33,7 @@ async function run() {
       },
     },
   ]);
-  console.log(result1);
+  console.log('result1', result1);
   console.log('=======');
   const result2 = await query.query({
     collection: 'pools',
@@ -51,7 +51,18 @@ async function run() {
       where: { id: { $lte: 1, $gte: 1 } },
     },
   });
-  console.log(result2);
+  console.log('result2', result2);
+  console.log('=======');
+  try {
+    const result3 = await query.stringQuery(`query MyQuery {
+      indexers {
+        allocatedTokens1
+      }
+    }`);
+    console.log('result3', result3);
+  } catch (error) {
+    console.error('error-result3', error);
+  }
 }
 
 run();
