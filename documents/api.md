@@ -2,31 +2,28 @@
 eth-graph-query
 </h1>
 
-The idea when create this package is trying to use `Json format` for creating a query with `string format` to [the graph](https://thegraph.com/)
+The idea when creating this package is trying to use `json format` for creating a query with `string format` to [the graph](https://thegraph.com/)
 
----
-
-### Modules
+## Modules
 
 - [EthGraphQuery](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/index.ts)
 
-  - async query<T>(data: string): Given query string, returns the data respective with it.
+  - async stringQuery<T>(data: string): Given query string, returns the data respective with it.
   - async query<T = any>(data: [GraphObject](#graphobject), metadata?: [Metadata](#metadata)): fetch data with a single query
-  - async query<T = any>(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): fetch data with a multiple query
+  - async multipleQuery<T = any>(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): fetch data with a multiple query
 
 - static [QueryBuilder](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/query-builder.ts)
   - buildJsonQuery(query: [QueryJson](#query_json)): build json string format
   - buildElements(elements: Array<[ElementType](#element_type)>): build elements array string format
-  - static buildMetadata(metadata: [Metadata](#metadata)): build metadata
+  - buildMetadata(metadata: [Metadata](#metadata)): build metadata
+  - buildInlineFragments(fragments: Array<[InlineFragmentType](#inline_fragment_type)>): build inline fragment
   - buildQuery(data: [GraphObject](#graphobject), metadata?: [Metadata](#metadata)): build a single query
-  - buildQuery(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): build a multiple query
+  - buildMultipleQuery(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): build a multiple query
   - makeFullQuery(query: string): create final query
 
----
+## API
 
-### API
-
-#### GraphObject <a name="graphobject"></a>
+### GraphObject <a name="graphobject"></a>
 
 - Package graph params, it is a simple json format with two elements
 
@@ -37,29 +34,30 @@ The idea when create this package is trying to use `Json format` for creating a 
 }
 ```
 
-#### GraphParams <a name="graph_params"></a>
+### GraphParams <a name="graph_params"></a>
 
 - `GraphParams` is represented to `the graph query`.
 
-| id  | key            | type                                | description                                                                                           |
-| :-- | :------------- | :---------------------------------- | :---------------------------------------------------------------------------------------------------- |
-| 1   | elements       | Array<[ElementType](#element_type)> | Elements you want to fetch in target collection                                                       |
-| 2   | where          | [QueryJson](#query_json)            | Representing to all filter command(you can consider that `where` is like to `WHERE` in `SQL` command) |
-| 3   | id             | string                              | Id of document(it is like a special filter)                                                           |
-| 4   | first          | number                              | If `first` is provided, `query command` only fetch up to `first` documents                            |
-| 5   | orderBy        | string                              | If `orderBy` is provided, the result data will be sort by `orderBy`                                   |
-| 6   | orderDirection | 'asc' or 'desc'                     | the order direction, it can be asc or desc                                                            |
-| 7   | skip           | number                              | The result data will skip `skip` documents if `skip` is provided                                      |
-| 8   | subgraphError  | 'allow' or 'deny'                   |                                                                                                       |
-| 9   | block          | [BlockQuery](#block_query)          |                                                                                                       |
+| id  | key             | type                                               | description                                                                                           |
+| :-- | :-------------- | :------------------------------------------------- | :---------------------------------------------------------------------------------------------------- |
+| 1   | elements        | Array<[ElementType](#element_type)>                | Elements you want to fetch in target collection                                                       |
+| 2   | inlineFragments | Array<[InlineFragmentType](#inline_fragment_type)> | Inline fragment                                                                                       |
+| 3   | where           | [QueryJson](#query_json)                           | Representing to all filter command(you can consider that `where` is like to `WHERE` in `SQL` command) |
+| 4   | id              | string                                             | Id of document(it is like a special filter)                                                           |
+| 5   | first           | number                                             | If `first` is provided, `query command` only fetch up to `first` documents                            |
+| 6   | orderBy         | string                                             | If `orderBy` is provided, the result data will be sort by `orderBy`                                   |
+| 7   | orderDirection  | 'asc' or 'desc'                                    | the order direction, it can be asc or desc                                                            |
+| 8   | skip            | number                                             | The result data will skip `skip` documents if `skip` is provided                                      |
+| 9   | subgraphError   | 'allow' or 'deny'                                  |                                                                                                       |
+| 10  | block           | [BlockQuery](#block_query)                         |                                                                                                       |
 
-#### ElementType <a name="element_type"></a>
+### ElementType <a name="element_type"></a>
 
 - Representing `json format` elements in query command. In the graphql, user can query some elements in document by providing it's name. A element in document can get normal type(number, boolean, string,...) or it is a complex type represented that another document.
 
 - `ElementType` can get two types: string or { collection: string; params?: [GraphParams](#graph_params) }. If element get a normal type, `ElementType` will get string type. On the other hand, `ElementType` will get { collection: string; params?: [GraphParams](#graph_params) } if element represented another document.
 
-#### QueryJson <a name="query_json"></a>
+### QueryJson <a name="query_json"></a>
 
 - `QueryJson` is `json format` that represented the filter of graph query. I divide `QueryJson` into two sub-query command. I name them are `normal query` and `option query`.
 
@@ -112,10 +110,27 @@ const result = await query.query({
 | 18  | in                     |
 | 19  | not_in                 |
 
-#### BlockQuery <a name="block_query"></a>
+### BlockQuery <a name="block_query"></a>
 
 - `BlockQuery` is block query of graph query. If you define it, you can get the data in a particular block number or block hash.
 
-#### Metadata <a name="metadata"></a>
+### Metadata <a name="metadata"></a>
 
 - `Metadata` is metadata you can query in a query command.
+
+#### InlineFragmentType <a name="inline_fragment_type"></a>
+
+- You can use inline fragment
+
+```js
+const result = await query.query({
+  collection: 'transactions',
+  params: {
+    elements: ['id'],
+    inlineFragments: [
+      { collection: 'BridgeDepositTransaction', params: { elements: ['id', 'l1Token'] } },
+      { collection: 'NameSignalTransaction', params: { elements: ['id', 'timestamp'] } },
+    ],
+  },
+});
+```
