@@ -13,9 +13,11 @@ export class NormalQuery {
 
   constructor(rootUrl: string, config?: AxiosRequestConfig) {
     this.root = rootUrl;
-    this.config = config
-      ? { ...config, ...{ headers: defaultHeader } }
-      : { headers: defaultHeader };
+    if (config) {
+      this.config = config;
+      if (!this.config?.headers) this.config.headers = {};
+      this.config['headers'] = { ...this.config['headers'], ...defaultHeader };
+    } else this.config = { headers: defaultHeader };
   }
 
   protected async get<T = any>(url: string, config?: AxiosRequestConfig) {

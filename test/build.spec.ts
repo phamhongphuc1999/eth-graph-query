@@ -44,7 +44,7 @@ describe('Build query', () => {
     assert.ok(query.includes('["1", "2", "3"]'));
     assert.ok(fullQuery.includes('query query'));
   });
-  it('Build wih inline fragments', () => {
+  it('Build with inline fragments', () => {
     const query = QueryBuilder.buildQuery({
       collection: 'networks',
       params: {

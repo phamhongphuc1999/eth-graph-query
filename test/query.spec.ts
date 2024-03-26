@@ -48,7 +48,7 @@ describe('Eth graph query', () => {
   });
   it('Test complex query', async () => {
     const result = await query.multipleQuery([
-      { collection: 'networks', params: { first: 10 } },
+      { collection: 'epoches', params: { first: 10 } },
       {
         collection: 'pools',
         params: {
@@ -101,7 +101,7 @@ describe('Eth graph query', () => {
   it('Test exception', async () => {
     try {
       await query.stringQuery(`query MyQuery {
-        pools 
+        pools
           allocation
         }
       }`);
