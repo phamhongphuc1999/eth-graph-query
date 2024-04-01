@@ -1,6 +1,5 @@
 import { assert, describe, it } from 'vitest';
-import { QueryBuilder } from '../src/query-builder.js';
-import { QueryJson } from '../src/type.js';
+import { QueryBuilder, QueryJson } from '..';
 
 const simpleWhereQuery: QueryJson = {
   key1: 'a',

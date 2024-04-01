@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosRequestConfig } from 'axios';
-import { NormalQuery } from './normal-query.js';
-import { QueryBuilder } from './query-builder.js';
-import { ErrorObject, GraphObject, Metadata } from './type.js';
+import { ApiQuery } from './api-query';
+import { QueryBuilder } from './query-builder';
+import { ErrorObject, GraphObject, Metadata } from './type';
 
-export class EthGraphQuery extends NormalQuery {
+export class EthGraphQuery extends ApiQuery {
   queryName: string;
 
   /**

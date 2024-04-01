@@ -1,5 +1,5 @@
 import { assert, describe, it } from 'vitest';
-import { EthGraphQuery } from '../src';
+import { EthGraphQuery } from '..';
 
 describe('Eth graph query', () => {
   const root = 'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet';

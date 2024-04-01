@@ -7,7 +7,7 @@ function responseBody<T>(res: AxiosResponse<T>) {
   return res.data;
 }
 
-export class NormalQuery {
+export class ApiQuery {
   root: string;
   config: AxiosRequestConfig;
 

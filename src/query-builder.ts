@@ -7,7 +7,7 @@ import {
   OptionKeys,
   QueryJson,
   WhereOptions,
-} from './type.js';
+} from './type';
 
 export class QueryBuilder {
   /**

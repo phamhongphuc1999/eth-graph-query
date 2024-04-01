@@ -1,20 +1,25 @@
 {
   "compilerOptions": {
-    "target": "es2020", // use es6 for running in react, you may change into es2020 to run example
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "module": "es2020", // use commonjs for running in react, you may change into es2020 to run example
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "types": ["vite/client", "node"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "downlevelIteration": true,
     "strict": true,
-    "lib": ["ES2020", "DOM"]
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["src/*"]
+    }
   },
-  "include": ["src/**/*.ts", "src/*.ts", "test/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src"],
+  "exclude": ["node_modules", "src/**/*.test.ts"]
 }
