@@ -8,15 +8,23 @@ Simple package for creating query to [the GraphQL](https://thegraph.com/).
 
 ### Installation
 
+- Using `npm`
+
 ```shell
 npm install eth-graph-query
 
 ```
 
-- Or if you use `yarn`
+- Using `yarn`
 
 ```shell
 yarn add eth-graph-query
+```
+
+- Using `bun`
+
+```shell
+bun install eth-graph-query
 ```
 
 ---
