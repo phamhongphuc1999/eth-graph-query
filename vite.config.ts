@@ -1,10 +1,8 @@
-// vite.config.ts
 import typescript from '@rollup/plugin-typescript';
 import path from 'path';
 import { typescriptPaths } from 'rollup-plugin-typescript-paths';
 import { defineConfig } from 'vite';
 
-// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   plugins: [],
   resolve: {
