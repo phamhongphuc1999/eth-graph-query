@@ -55,7 +55,7 @@ const result = await client.query({
     where: { balance: { $gt: '1000' } },
     first: 10,
     orderBy: 'balance',
-    orderDirection: 'desc'
+    orderDirection: 'desc',
   },
 });
 ```
@@ -68,12 +68,12 @@ Fetch data from multiple collections in a single round-trip.
 const result = await client.multipleQuery([
   {
     collection: 'tokens',
-    params: { elements: ['id', 'symbol'], first: 5 }
+    params: { elements: ['id', 'symbol'], first: 5 },
   },
   {
     collection: 'factories',
-    params: { elements: ['id', 'poolCount'] }
-  }
+    params: { elements: ['id', 'poolCount'] },
+  },
 ]);
 ```
 
@@ -92,18 +92,18 @@ const result = await client.query({
         collection: 'swaps',
         params: {
           elements: ['amount0', 'amount1', 'timestamp'],
-          where: { 
+          where: {
             amount0: { $gt: 0 },
-            timestamp: { $gte: 1672531200 } 
+            timestamp: { $gte: 1672531200 },
           },
-          first: 50
-        }
-      }
+          first: 50,
+        },
+      },
     ],
     where: {
-      id: { $in: ['0x123...', '0x456...'] }
-    }
-  }
+      id: { $in: ['0x123...', '0x456...'] },
+    },
+  },
 });
 ```
 
@@ -117,12 +117,8 @@ Documentation for all functions and types can be found in the [API Docs](https:/
 
 ## 🛠 For Developers
 
-### Run Examples
-```shell
-npm run example example/file-name
-```
-
 ### Run Tests
+
 ```shell
 npm run test
 ```
