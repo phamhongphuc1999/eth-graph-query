@@ -4,13 +4,18 @@ import { ApiQuery } from './api-query';
 import { QueryBuilder } from './query-builder';
 import { ErrorObject, GraphObject, Metadata } from './type';
 
+/**
+ * Main class for performing queries against The Graph protocols.
+ * Extends ApiQuery to handle HTTP communication.
+ */
 export class EthGraphQuery extends ApiQuery {
+  /** The name of the GraphQL query, used in makeFullQuery. */
   queryName: string;
 
   /**
-   * The constructor for create a query instance.
-   * @param {string} rootUrl The url leading to the graph
-   * @param {AxiosRequestConfig | undefined} config Config for base axios
+   * Initializes a new EthGraphQuery instance.
+   * @param rootUrl - The endpoint URL of the subgraph.
+   * @param config - Optional axios configuration for custom headers or timeouts.
    */
   constructor(rootUrl: string, config?: AxiosRequestConfig) {
     super(rootUrl, config);
@@ -18,44 +23,45 @@ export class EthGraphQuery extends ApiQuery {
   }
 
   /**
-   * Given query string, returns the data respective with it.
-   * @param {string} query A query string containing all data you want to fetch
-   * @returns The data respective with the query string
+   * Executes a raw GraphQL query string.
+   * @template T - The expected return type of the data.
+   * @param data - The raw GraphQL query string.
+   * @returns A promise resolving to the query result.
+   * @throws Error if the response contains any GraphQL errors.
    */
   async stringQuery<T = any>(data: string): Promise<T> {
-    const result = await this.post<{ query: string }, T | ErrorObject>('', { query: data });
-    if ((result as ErrorObject).errors) {
-      const _error = result as ErrorObject;
-      throw new Error(_error.errors[0].message);
+    const result = await this.post<{ query: string }, any>('', { query: data });
+
+    if (result && typeof result === 'object' && 'errors' in result) {
+      const errorObject = result as ErrorObject;
+      const messages = errorObject.errors.map((error) => error.message).join('; ');
+      throw new Error(`GraphQL Error: ${messages}`);
     }
-    return result as T;
+
+    return result.data as T;
   }
 
   /**
-   * Create a query to a particular collection, returns the data respective with the query data.
-   * @param {GraphObject} data An data for create query, contains two elements:
-   *    1. collection: string - collection name
-   *    2. params: GraphParams | undefined - If it is defined, it create a query to the collection
-   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
-   * @returns The data respective with the query data
+   * Executes a single collection query using a JSON configuration.
+   * @template T - The expected return type of the data.
+   * @param data - The configuration for the collection query.
+   * @param metadata - Optional metadata fields to include in the query.
+   * @returns A promise resolving to the fetched data.
    */
   async query<T = any>(data: GraphObject, metadata?: Metadata): Promise<T> {
-    const _data = data as GraphObject;
-    const sQuery = QueryBuilder.buildQuery(
-      { collection: _data.collection, params: _data.params },
-      metadata,
-    );
-    return await this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+    const sQuery = QueryBuilder.buildQuery(data, metadata);
+    return this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
   }
 
   /**
-   * Create a query to many collections, returns the data respective with the query data.
-   * @param {Array<GraphObject>} data An array contain data to query to many collections
-   * @param {Metadata | undefined} metadata If it is defined, the query can get metadata that you defined
-   * @returns The data respective with the query data
+   * Executes multiple collection queries in a single request using JSON configurations.
+   * @template T - The expected return type of the data.
+   * @param data - An array of query configurations.
+   * @param metadata - Optional metadata fields to include in the query.
+   * @returns A promise resolving to the merged results of all queries.
    */
   async multipleQuery<T = any>(data: Array<GraphObject>, metadata?: Metadata): Promise<T> {
     const sQuery = QueryBuilder.buildMultipleQuery(data, metadata);
-    return await this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+    return this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
   }
 }

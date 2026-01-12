@@ -1,154 +1,139 @@
-<h1>
-eth-graph-query
-</h1>
+# eth-graph-query
 
-Simple package for creating query to [the GraphQL](https://thegraph.com/).
+A lightweight and flexible library for building [The Graph (GraphQL)](https://thegraph.com/) queries using simple JSON objects. Eliminate the need for complex string concatenation and maintain type-safe queries.
+
+[![npm version](https://img.shields.io/npm/v/eth-graph-query.svg)](https://www.npmjs.com/package/eth-graph-query)
+[![license](https://img.shields.io/npm/l/eth-graph-query.svg)](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/LICENSE)
 
 ---
 
-### Installation
+## 🚀 Features
 
-- Using `npm`
+- **JSON to GraphQL**: Convert nested JSON structures into valid GraphQL query strings.
+- **Multiple Collections**: Query multiple collections in a single HTTP request.
+- **Deep Nesting**: Support for nested collection queries and entity relationships.
+- **Advanced Filtering**: Full support for The Graph's operators (`_gt`, `_in`, `_contains`, etc.) via `$` prefix.
+- **Inline Fragments**: Support for GraphQL inline fragments (`... on Type`).
+- **TypeScript First**: Full type definitions for parameters, filters, and metadata.
+- **Metadata Support**: Easily fetch subgraph metadata (`_meta`).
+
+---
+
+## 📦 Installation
 
 ```shell
+# npm
 npm install eth-graph-query
 
-```
-
-- Using `yarn`
-
-```shell
+# yarn
 yarn add eth-graph-query
-```
 
-- Using `bun`
-
-```shell
+# bun
 bun install eth-graph-query
 ```
 
 ---
 
-### Usage
+## 💡 Usage
 
-- The first thing you have to do is to create a query instance
+### 1. Initialize the Client
 
-```js
-const query = new EthGraphQuery(root);
+```typescript
+import { EthGraphQuery } from 'eth-graph-query';
+
+const rootUrl = 'https://api.thegraph.com/subgraphs/name/username/subgraph-name';
+const client = new EthGraphQuery(rootUrl);
 ```
 
-- This package has three query options. Simply, you can create a direct string query
+### 2. Single Collection Query
 
-```js
-result = await query.stringQuery(`query query {
-  collection1(first: 10) {
-    element1
-    element2
-  }
-}`);
-```
-
-- More readable, you can create a single json query
-
-```js
-const result = await query.query({
-  collection: 'collection1',
+```typescript
+const result = await client.query({
+  collection: 'users',
   params: {
-    elements: ['element1', 'element2'],
+    elements: ['id', 'name', 'balance'],
+    where: { balance: { $gt: '1000' } },
     first: 10,
+    orderBy: 'balance',
+    orderDirection: 'desc'
   },
 });
 ```
 
-- You can create a multiple json queries
+### 3. Multiple Collections Query
 
-```js
-const result = await query.multipleQuery([
+Fetch data from multiple collections in a single round-trip.
+
+```typescript
+const result = await client.multipleQuery([
   {
-    collection: 'collection1',
-    params: {
-      elements: ['element11', 'element12'],
-    },
+    collection: 'tokens',
+    params: { elements: ['id', 'symbol'], first: 5 }
   },
   {
-    collection: 'collection2',
-    params: {
-      elements: ['element21', 'element22'],
-    },
-  },
+    collection: 'factories',
+    params: { elements: ['id', 'poolCount'] }
+  }
 ]);
 ```
 
-- You can create a complex query
+### 4. Advanced Nested Query & Filters
 
-```js
-const result = await query.multipleQuery([
-  {
-    collection: 'collection1',
-    params: {
-      elements: ['element11', 'element12'],
-      where: { element11: 'abc' },
-    },
-  },
-  {
-    collection: 'collection2',
-    params: {
-      elements: [
-        'element21',
-        {
-          collection: 'collection3',
-          params: {
-            elements: ['element31'],
-            where: {
-              id: { $in: ['123'] },
-              token_: { setId: { $in: ['1', 2, true] } },
-              element31: 'element31',
-            },
-            first: 50,
+Build complex queries with nested collections and operators.
+
+```typescript
+const result = await client.query({
+  collection: 'pools',
+  params: {
+    elements: [
+      'id',
+      'token0',
+      {
+        collection: 'swaps',
+        params: {
+          elements: ['amount0', 'amount1', 'timestamp'],
+          where: { 
+            amount0: { $gt: 0 },
+            timestamp: { $gte: 1672531200 } 
           },
-        },
-      ],
-      where: {
-        element21: '123',
-        collection3: { element31: '123' },
-      },
-      inlineFragments: [
-        {
-          collection: 'BridgeDepositTransaction',
-          params: { elements: ['id', 'l1Token'] },
-        },
-        {
-          collection: 'NameSignalTransaction',
-          params: { elements: ['id', 'timestamp'] },
-        },
-      ],
-    },
-  },
-]);
+          first: 50
+        }
+      }
+    ],
+    where: {
+      id: { $in: ['0x123...', '0x456...'] }
+    }
+  }
+});
 ```
 
 ---
 
-### API
+## 📘 API Reference
 
-Read the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/documents/api.md), you also read my [examples](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/examples)
+Documentation for all functions and types can be found in the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/documents/api.md).
 
 ---
 
-### For developer
+## 🛠 For Developers
 
-- Run example
-
+### Run Examples
 ```shell
 npm run example example/file-name
 ```
 
-- Run test
-
+### Run Tests
 ```shell
 npm run test
 ```
 
-### Reference
+---
 
-- https://spec.graphql.org
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔗 References
+
+- [The Graph Documentation](https://thegraph.com/docs/)
+- [GraphQL Specification](https://spec.graphql.org)

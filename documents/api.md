@@ -7,7 +7,6 @@ The idea when creating this package is trying to use `json format` for creating 
 ## Modules
 
 - [EthGraphQuery](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/index.ts)
-
   - async stringQuery<T>(data: string): Given query string, returns the data respective with it.
   - async query<T = any>(data: [GraphObject](#graphobject), metadata?: [Metadata](#metadata)): fetch data with a single query
   - async multipleQuery<T = any>(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): fetch data with a multiple query

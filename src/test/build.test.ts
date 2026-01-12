@@ -105,4 +105,26 @@ describe('Build query', () => {
     assert.ok(query.includes('null'));
     assert.ok(query.includes('["0x123", "0x456"]'));
   });
+  it('Deeply nested where query', () => {
+    const query = QueryBuilder.buildJsonQuery({
+      level1: {
+        level2: {
+          level3: {
+            $gt: 10,
+          },
+        },
+      },
+    });
+    assert.ok(query.includes('level1: {level2: {level3_gt: 10}}'));
+  });
+  it('Empty elements and inline fragments', () => {
+    const query = QueryBuilder.buildQuery({
+      collection: 'test',
+      params: {
+        elements: [],
+        inlineFragments: [],
+      },
+    });
+    assert.equal(query, 'test {id}');
+  });
 });
