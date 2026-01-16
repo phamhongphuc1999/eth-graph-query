@@ -1,10 +1,14 @@
-import typescript from '@rollup/plugin-typescript';
 import path from 'path';
-import { typescriptPaths } from 'rollup-plugin-typescript-paths';
 import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig({
-  plugins: [],
+  plugins: [
+    dts({
+      rollupTypes: true,
+      insertTypesEntry: true,
+    }),
+  ],
   resolve: {
     alias: [
       {
@@ -26,17 +30,7 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: [],
-      plugins: [
-        typescriptPaths({
-          preserveExtensions: true,
-        }),
-        typescript({
-          sourceMap: false,
-          declaration: true,
-          outDir: 'dist',
-        }),
-      ],
+      external: ['axios'],
     },
   },
 });

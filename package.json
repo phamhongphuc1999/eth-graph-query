@@ -1,7 +1,6 @@
 {
   "name": "eth-graph-query",
-  "private": true,
-  "version": "2.0.20",
+  "version": "2.0.21",
   "description": "A lightweight and flexible library for building The Graph queries using simple JSON objects. Eliminate the need for complex string concatenation and maintain type-safe queries.",
   "type": "module",
   "main": "dist/index.cjs",
@@ -10,15 +9,16 @@
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "scripts": {
-    "build": "npm run clear && tsc && vite build",
+    "build": "bun run clear && tsc && vite build",
     "preview": "vite preview",
     "clear": "rm -rf dist",
     "test": "vitest run",
-    "prepare": "npm run build && husky install",
+    "prepare": "bun run build && husky install",
     "eslint": "eslint --config ./eslint.config.js --cache",
     "format": "prettier --write .",
-    "prepublishOnly": "npm run clear && npm run build && npm run test"
+    "prepublishOnly": "bun run clear && bun run build && bun run test"
   },
   "repository": {
     "type": "git",
@@ -34,15 +34,15 @@
     "url": "https://github.com/phamhongphuc1999/eth-graph-query/issues"
   },
   "homepage": "https://github.com/phamhongphuc1999/eth-graph-query#readme",
-  "dependencies": {
+  "peerDependencies": {
     "axios": "^1.13.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.4.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@eslint/js": "^9.29.0",
-    "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "^20.12.2",
+    "axios": "^1.13.2",
     "eslint": "^9.29.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
@@ -51,11 +51,10 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "husky": "^9.1.6",
     "path": "^0.12.7",
-    "rollup-plugin-typescript-paths": "^1.5.0",
-    "tslib": "^2.6.2",
     "typescript": "5.5.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^7.2.7",
+    "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.0.15"
   },
   "contributors": [
