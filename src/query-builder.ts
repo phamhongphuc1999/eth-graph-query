@@ -4,6 +4,7 @@ import {
   type ElementType,
   type GraphObject,
   type GraphParams,
+  type GraphQLArgValue,
   type InlineFragmentType,
   type Metadata,
   type QueryJson,
@@ -11,16 +12,40 @@ import {
 
 const MAX_FIRST = 1000;
 const MAX_SKIP = 5000;
+const OPTION_KEYS_SET = new Set(OptionKeys as readonly string[]);
 
 export class QueryBuilder {
   private static escapeGraphqlString(value: string): string {
     return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   }
 
-  private static serializeValue(value: string | number | boolean | null): string {
+  static serializeValue(value: string | number | boolean | null): string {
     if (value === null) return 'null';
     if (typeof value === 'string') return `"${this.escapeGraphqlString(value)}"`;
     return `${value}`;
+  }
+
+  private static serializeArgValue(value: GraphQLArgValue): string {
+    if (value === null) return 'null';
+    if (value === undefined) return 'null';
+    if (typeof value === 'string') return this.serializeValue(value);
+    if (typeof value === 'number' || typeof value === 'boolean') return `${value}`;
+    if (Array.isArray(value)) {
+      return `[${value.map((item) => this.serializeArgValue(item)).join(', ')}]`;
+    }
+    const entries = this.buildArgs(value);
+    return `{${entries.join(', ')}}`;
+  }
+
+  private static buildArgs(args: { [key: string]: GraphQLArgValue }): Array<string> {
+    const entries: Array<string> = [];
+    for (const key in args) {
+      if (!Object.prototype.hasOwnProperty.call(args, key)) continue;
+      const value = args[key];
+      if (value === undefined) continue;
+      entries.push(`${key}: ${this.serializeArgValue(value)}`);
+    }
+    return entries;
   }
 
   /**
@@ -32,12 +57,11 @@ export class QueryBuilder {
   static buildJsonQuery(query: QueryJson): string {
     const whereList = [];
     for (const key in query) {
+      if (!Object.prototype.hasOwnProperty.call(query, key)) continue;
       const value = query[key];
       if (value === undefined) continue;
-
-      if (value === null) {
-        whereList.push(`${key}: null`);
-      } else if (Array.isArray(value)) {
+      if (value === null) whereList.push(`${key}: null`);
+      else if (Array.isArray(value)) {
         const queryArray = value as Array<string | number | boolean>;
         whereList.push(
           `${key}: [${queryArray
@@ -51,10 +75,12 @@ export class QueryBuilder {
         const options = value as { [key: string]: any };
 
         for (const option in options) {
+          if (!Object.prototype.hasOwnProperty.call(options, option)) continue;
           const optionValue = options[option];
           if (option.startsWith('$')) {
-            const realOperator = option.slice(1);
-            if ((OptionKeys as readonly string[]).includes(realOperator)) {
+            let realOperator = option.slice(1);
+            if (realOperator === 'end_with_nocase') realOperator = 'ends_with_nocase';
+            if (OPTION_KEYS_SET.has(realOperator)) {
               operatorJson[`${key}_${realOperator}`] = optionValue;
             } else {
               normalJson[option] = optionValue;
@@ -102,19 +128,17 @@ export class QueryBuilder {
     const sBlockQuery = blockQuery.join(', ');
     if (sBlockQuery.length > 0) result += `(block: {${sBlockQuery}})`;
 
-    const filters: Array<string> = [];
-    const blockFilters: Array<string> = [];
+    const filters = new Set<string>();
+    const blockFilters = new Set<string>();
     if (metadata.elements) {
       for (const filter of metadata.elements) {
         if (filter === 'deployment' || filter === 'hasIndexingErrors') {
-          if (!filters.includes(filter)) filters.push(filter);
-        } else {
-          if (!blockFilters.includes(filter)) blockFilters.push(filter);
-        }
+          filters.add(filter);
+        } else blockFilters.add(filter);
       }
-      const blockFilterQuery = blockFilters.join(' ');
-      if (blockFilterQuery.length > 0) filters.push(`block{${blockFilterQuery}}`);
-      const sFiltersQuery = filters.join(' ');
+      const blockFilterQuery = Array.from(blockFilters).join(' ');
+      if (blockFilterQuery.length > 0) filters.add(`block{${blockFilterQuery}}`);
+      const sFiltersQuery = Array.from(filters).join(' ');
       if (sFiltersQuery.length > 0) result += `{${sFiltersQuery}}`;
     }
     return result.length > 0 ? `_meta${result}` : '';
@@ -156,41 +180,37 @@ export class QueryBuilder {
     if (params?.orderBy) filters.push(`orderBy: ${params.orderBy}`);
     if (params?.orderDirection) filters.push(`orderDirection: ${params.orderDirection}`);
     if (params?.subgraphError) filters.push(`subgraphError: ${params.subgraphError}`);
-
+    if (params?.args) {
+      const args = this.buildArgs(params.args);
+      if (args.length > 0) filters.push(...args);
+    }
     if (params?.first !== undefined) {
       const first = Math.max(0, Math.min(params.first, MAX_FIRST));
       filters.push(`first: ${first}`);
     }
-
     if (params?.skip !== undefined) {
       const skip = Math.max(0, Math.min(params.skip, MAX_SKIP));
       filters.push(`skip: ${skip}`);
     }
-
     if (params?.where) {
       const sWhere = this.buildJsonQuery(params.where);
       if (sWhere.length > 0) filters.push(`where: {${sWhere}}`);
     }
-
     if (params?.block) {
       const sBlock = this.buildJsonQuery(params.block);
       if (sBlock.length > 0) filters.push(`block: {${sBlock}}`);
     }
-
     const filterString = filters.length > 0 ? `(${filters.join(', ')})` : '';
 
     let elements = ['id'];
     if (params?.elements && params.elements.length > 0) {
       elements = this.buildElements(params.elements);
     }
-
     let inlineFragments = '';
     if (params?.inlineFragments && params.inlineFragments.length > 0) {
       inlineFragments = ` ${this.buildInlineFragments(params.inlineFragments)}`;
     }
-
     const finalQuery = `${collection}${filterString} {${elements.join(' ')}${inlineFragments}}`;
-
     if (metadata) {
       const sMetadata = this.buildMetadata(metadata);
       return sMetadata ? `${sMetadata} ${finalQuery}` : finalQuery;

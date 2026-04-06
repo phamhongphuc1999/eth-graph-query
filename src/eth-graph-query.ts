@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { AxiosRequestConfig } from 'axios';
-import { ApiQuery } from './api-query';
+import { ApiQuery, type RequestOptions } from './api-query';
 import { QueryBuilder } from './query-builder';
 import type { ErrorObject, GraphObject, Metadata } from './type';
 
@@ -15,9 +14,9 @@ export class EthGraphQuery extends ApiQuery {
   /**
    * Initializes a new EthGraphQuery instance.
    * @param rootUrl - The endpoint URL of the subgraph.
-   * @param config - Optional axios configuration for custom headers or timeouts.
+   * @param config - Optional request configuration for custom headers or timeouts.
    */
-  constructor(rootUrl: string, config?: AxiosRequestConfig) {
+  constructor(rootUrl: string, config?: RequestOptions) {
     super(rootUrl, config);
     this.queryName = 'query';
   }

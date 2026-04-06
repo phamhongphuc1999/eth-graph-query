@@ -1,25 +1,26 @@
 # eth-graph-query
 
-A lightweight and flexible library for building [The Graph (GraphQL)](https://thegraph.com/) queries using simple JSON objects. Eliminate the need for complex string concatenation and maintain type-safe queries.
+A lightweight GraphQL query builder and client with first-class support for The Graph. Build queries using JSON, avoid string concatenation, and keep strong TypeScript types.
 
 [![npm version](https://img.shields.io/npm/v/eth-graph-query.svg)](https://www.npmjs.com/package/eth-graph-query)
 [![license](https://img.shields.io/npm/l/eth-graph-query.svg)](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/LICENSE)
 
 ---
 
-## 🚀 Features
+## Features
 
-- **JSON to GraphQL**: Convert nested JSON structures into valid GraphQL query strings.
-- **Multiple Collections**: Query multiple collections in a single HTTP request.
-- **Deep Nesting**: Support for nested collection queries and entity relationships.
-- **Advanced Filtering**: Full support for The Graph's operators (`_gt`, `_in`, `_contains`, etc.) via `$` prefix.
-- **Inline Fragments**: Support for GraphQL inline fragments (`... on Type`).
-- **TypeScript First**: Full type definitions for parameters, filters, and metadata.
-- **Metadata Support**: Easily fetch subgraph metadata (`_meta`).
+- JSON to GraphQL: Convert nested JSON structures into valid GraphQL query strings.
+- Multiple collections: Query multiple collections in a single HTTP request.
+- Deep nesting: Support nested collection queries and entity relationships.
+- Advanced filtering: The Graph operators via `$` prefix (e.g., `$gt`, `$in`, `$contains`).
+- Inline fragments: Support GraphQL inline fragments (`... on Type`).
+- Generic GraphQL args: Pass schema-agnostic arguments via `params.args`.
+- TypeScript first: Full type definitions for parameters, filters, and metadata.
+- Metadata support: Fetch subgraph metadata (`_meta`) when using The Graph.
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```shell
 # npm
@@ -29,23 +30,28 @@ npm install eth-graph-query
 yarn add eth-graph-query
 
 # bun
-bun install eth-graph-query
+bun add eth-graph-query
 ```
 
 ---
 
-## 💡 Usage
-
-### 1. Initialize the Client
+## Quick Start
 
 ```typescript
 import { EthGraphQuery } from 'eth-graph-query';
 
 const rootUrl = 'https://api.thegraph.com/subgraphs/name/username/subgraph-name';
-const client = new EthGraphQuery(rootUrl);
+const client = new EthGraphQuery(rootUrl, {
+  headers: { Authorization: 'Bearer <token>' },
+  timeoutMs: 10_000,
+});
 ```
 
-### 2. Single Collection Query
+---
+
+## Usage
+
+### 1. Single Collection Query (The Graph)
 
 ```typescript
 const result = await client.query({
@@ -60,9 +66,7 @@ const result = await client.query({
 });
 ```
 
-### 3. Multiple Collections Query
-
-Fetch data from multiple collections in a single round-trip.
+### 2. Multiple Collections Query
 
 ```typescript
 const result = await client.multipleQuery([
@@ -77,9 +81,7 @@ const result = await client.multipleQuery([
 ]);
 ```
 
-### 4. Advanced Nested Query & Filters
-
-Build complex queries with nested collections and operators.
+### 3. Advanced Nested Query & Filters (The Graph)
 
 ```typescript
 const result = await client.query({
@@ -107,15 +109,42 @@ const result = await client.query({
 });
 ```
 
+### 4. Generic GraphQL Arguments (Schema-Agnostic)
+
+Use `params.args` to pass arbitrary GraphQL arguments for non-The-Graph schemas.
+
+```typescript
+const result = await client.query({
+  collection: 'users',
+  params: {
+    args: {
+      first: 20,
+      orderBy: 'name',
+      filter: { active: true },
+    },
+    elements: ['id', 'name'],
+  },
+});
+```
+
 ---
 
-## 📘 API Reference
+## API Reference
 
-Documentation for all functions and types can be found in the [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/documents/api.md).
+Documentation for all functions and types can be found in the API docs:
+
+- [API Docs](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/documents/api.md)
 
 ---
 
-## 🛠 For Developers
+## Notes
+
+- This library uses the native `fetch` API (Node 20+). No Axios dependency.
+- The Graph-specific features (`where`, `_meta`, `block`) remain supported.
+
+---
+
+## For Developers
 
 ### Run Tests
 
@@ -125,11 +154,13 @@ npm run test
 
 ---
 
-## 📜 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
 
-## 🔗 References
+---
+
+## References
 
 - [The Graph Documentation](https://thegraph.com/docs/)
 - [GraphQL Specification](https://spec.graphql.org)
