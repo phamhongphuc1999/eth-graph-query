@@ -1,15 +1,22 @@
 {
   "name": "eth-graph-query",
   "version": "2.0.21",
-  "description": "A lightweight and flexible library for building The Graph queries using simple JSON objects. Eliminate the need for complex string concatenation and maintain type-safe queries.",
+  "description": "A lightweight GraphQL query builder and client with first-class support for The Graph. Build queries using JSON, avoid string concatenation, and keep strong TypeScript types.",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
-  "sideEffects": false,
   "scripts": {
     "build": "bun run clear && tsc && vite build",
     "preview": "vite preview",

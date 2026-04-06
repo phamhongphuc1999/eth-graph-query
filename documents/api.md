@@ -1,32 +1,29 @@
-<h1>
-eth-graph-query
-</h1>
+# eth-graph-query
 
-The idea when creating this package is trying to use `json format` for creating a query with `string format` to [the graph](https://thegraph.com/)
+This package builds GraphQL queries using JSON and provides a lightweight client. It supports The Graph conventions (e.g., `where`, `_meta`) and also schema-agnostic arguments via `params.args`.
 
 ## Modules
 
-- [EthGraphQuery](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/index.ts)
-  - async stringQuery<T>(data: string): Given query string, returns the data respective with it.
-  - async query<T = any>(data: [GraphObject](#graphobject), metadata?: [Metadata](#metadata)): fetch data with a single query
-  - async multipleQuery<T = any>(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): fetch data with a multiple query
+- `EthGraphQuery`
+  - `async stringQuery<T>(data: string)`: Execute a raw GraphQL query string.
+  - `async query<T = any>(data: GraphObject, metadata?: Metadata)`: Build and execute a single query.
+  - `async multipleQuery<T = any>(data: Array<GraphObject>, metadata?: Metadata)`: Build and execute multiple queries in one request.
 
-- static [QueryBuilder](https://github.com/phamhongphuc1999/eth-graph-query/blob/main/src/query-builder.ts)
-  - buildJsonQuery(query: [QueryJson](#query_json)): build json string format
-  - buildElements(elements: Array<[ElementType](#element_type)>): build elements array string format
-  - buildMetadata(metadata: [Metadata](#metadata)): build metadata
-  - buildInlineFragments(fragments: Array<[InlineFragmentType](#inline_fragment_type)>): build inline fragment
-  - buildQuery(data: [GraphObject](#graphobject), metadata?: [Metadata](#metadata)): build a single query
-  - buildMultipleQuery(data: Array<[GraphObject](#graphobject)>, metadata?: [Metadata](#metadata)): build a multiple query
-  - makeFullQuery(query: string): create final query
+- `QueryBuilder` (static)
+  - `buildJsonQuery(query: QueryJson)`: Build The Graph `where`/`block` filter string.
+  - `buildArgs(args: Record<string, GraphQLArgValue>)`: Build generic GraphQL argument entries.
+  - `buildElements(elements: Array<ElementType>)`: Build element selection strings.
+  - `buildMetadata(metadata: Metadata)`: Build `_meta` selection (The Graph).
+  - `buildInlineFragments(fragments: Array<InlineFragmentType>)`: Build inline fragments.
+  - `buildQuery(data: GraphObject, metadata?: Metadata)`: Build a single query.
+  - `buildMultipleQuery(data: Array<GraphObject>, metadata?: Metadata)`: Build multiple queries.
+  - `makeFullQuery(query: string)`: Wrap a query fragment inside a GraphQL `query` operation.
 
 ## API
 
 ### GraphObject <a name="graphobject"></a>
 
-- Package graph params, it is a simple json format with two elements
-
-```shell
+```ts
 {
   collection: string;
   params?: GraphParams;
@@ -35,35 +32,40 @@ The idea when creating this package is trying to use `json format` for creating 
 
 ### GraphParams <a name="graph_params"></a>
 
-- `GraphParams` is represented to `the graph query`.
+`GraphParams` describes the parameters for a collection query.
 
-| id  | key             | type                                               | description                                                                                           |
-| :-- | :-------------- | :------------------------------------------------- | :---------------------------------------------------------------------------------------------------- |
-| 1   | elements        | Array<[ElementType](#element_type)>                | Elements you want to fetch in target collection                                                       |
-| 2   | inlineFragments | Array<[InlineFragmentType](#inline_fragment_type)> | Inline fragment                                                                                       |
-| 3   | where           | [QueryJson](#query_json)                           | Representing to all filter command(you can consider that `where` is like to `WHERE` in `SQL` command) |
-| 4   | id              | string                                             | Id of document(it is like a special filter)                                                           |
-| 5   | first           | number                                             | If `first` is provided, `query command` only fetch up to `first` documents                            |
-| 6   | orderBy         | string                                             | If `orderBy` is provided, the result data will be sort by `orderBy`                                   |
-| 7   | orderDirection  | 'asc' or 'desc'                                    | the order direction, it can be asc or desc                                                            |
-| 8   | skip            | number                                             | The result data will skip `skip` documents if `skip` is provided                                      |
-| 9   | subgraphError   | 'allow' or 'deny'                                  |                                                                                                       |
-| 10  | block           | [BlockQuery](#block_query)                         |                                                                                                       |
+| id  | key             | type                            | description                                        |
+| :-- | :-------------- | :------------------------------ | :------------------------------------------------- |
+| 1   | elements        | Array<ElementType>              | Fields to fetch in the target collection          |
+| 2   | inlineFragments | Array<InlineFragmentType>       | Inline fragments (`... on Type`)                  |
+| 3   | args            | Record<string, GraphQLArgValue> | Generic GraphQL arguments (schema-agnostic)       |
+| 4   | where           | QueryJson                       | The Graph-specific `where` filters                |
+| 5   | id              | string                          | Shortcut for `id` filter                           |
+| 6   | first           | number                          | Limit results (The Graph default max is 1000)      |
+| 7   | orderBy         | string                          | Order by field                                     |
+| 8   | orderDirection  | 'asc' or 'desc'                 | Order direction                                    |
+| 9   | skip            | number                          | Skip results (The Graph default max is 5000)       |
+| 10  | subgraphError   | 'allow' or 'deny'               | The Graph subgraph error behavior                 |
+| 11  | block           | BlockQuery                      | The Graph block query (`hash` or `number`)         |
 
 ### ElementType <a name="element_type"></a>
 
-- Representing `json format` elements in query command. In the graphql, user can query some elements in document by providing it's name. A element in document can get normal type(number, boolean, string,...) or it is a complex type represented that another document.
+An element can be a field name (`string`) or a nested collection.
 
-- `ElementType` can get two types: string or { collection: string; params?: [GraphParams](#graph_params) }. If element get a normal type, `ElementType` will get string type. On the other hand, `ElementType` will get { collection: string; params?: [GraphParams](#graph_params) } if element represented another document.
+```ts
+type ElementType =
+  | string
+  | {
+      collection: string;
+      params?: GraphParams;
+    };
+```
 
 ### QueryJson <a name="query_json"></a>
 
-- `QueryJson` is `json format` that represented the filter of graph query. I divide `QueryJson` into two sub-query command. I name them are `normal query` and `option query`.
+`QueryJson` represents The Graph `where` filters.
 
-- `normal query` will query documents that have `element` that get the value provided in `normal query`.
-
-```js
-const query = new EthGraphQuery(root);
+```ts
 const result = await query.query({
   collection: 'collection1',
   params: {
@@ -73,9 +75,9 @@ const result = await query.query({
 });
 ```
 
-- In above example, a query will get all documents that have element1 equal 1234. In more complex case, `option query` create a more complicated that `normal`.
+Complex operators use a `$` prefix (mapped to The Graph `_` operators):
 
-```js
+```ts
 const result = await query.query({
   collection: 'collection1',
   params: {
@@ -85,14 +87,14 @@ const result = await query.query({
 });
 ```
 
-- In above example, the query will get all documents that have element1 equal 1234. Moreover, the id of documents has to get `0x1234` or `0x4321`. Graphql support some operators
+Supported operator suffixes:
 
 | id  | operator               |
 | :-- | :--------------------- |
 | 1   | contains               |
 | 2   | contains_nocase        |
 | 3   | ends_with              |
-| 4   | end_with_nocase        |
+| 4   | ends_with_nocase       |
 | 5   | starts_with            |
 | 6   | starts_with_nocase     |
 | 7   | not_contains           |
@@ -111,17 +113,26 @@ const result = await query.query({
 
 ### BlockQuery <a name="block_query"></a>
 
-- `BlockQuery` is block query of graph query. If you define it, you can get the data in a particular block number or block hash.
+`BlockQuery` specifies a block hash or number (The Graph).
+
+```ts
+{ hash?: string; number?: number }
+```
 
 ### Metadata <a name="metadata"></a>
 
-- `Metadata` is metadata you can query in a query command.
+`Metadata` describes The Graph `_meta` selection and block query.
 
-#### InlineFragmentType <a name="inline_fragment_type"></a>
+```ts
+{
+  elements?: Array<'deployment' | 'hasIndexingErrors' | 'hash' | 'number' | 'timestamp'>;
+  blockQuery?: { hash?: string; number?: number; number_gte?: number };
+}
+```
 
-- You can use inline fragment
+### InlineFragmentType <a name="inline_fragment_type"></a>
 
-```js
+```ts
 const result = await query.query({
   collection: 'transactions',
   params: {

@@ -16,6 +16,7 @@ export const OptionKeys = [
   'contains',
   'contains_nocase',
   'ends_with',
+  'ends_with_nocase',
   'end_with_nocase',
   'starts_with',
   'starts_with_nocase',
@@ -101,9 +102,31 @@ export type WhereOptions = TextWhereOptions & CommonWhereOptions;
 export type QueryJson = { [key: string]: QueryJson | WhereOptions | BaseQueryType };
 
 /**
+ * Generic GraphQL argument value for schema-agnostic queries.
+ */
+export type GraphQLArgValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Array<GraphQLArgValue>
+  | { [key: string]: GraphQLArgValue };
+
+/**
  * Filter for querying data at a specific block.
  */
 export type BlockQuery = {
+  /** Filter by block hash. */
+  hash?: string;
+  /** Filter by exact block number. */
+  number?: number;
+};
+
+/**
+ * Metadata block query supports number_gte in The Graph _meta.
+ */
+export type MetadataBlockQuery = {
   /** Filter by block hash. */
   hash?: string;
   /** Filter by exact block number. */
@@ -119,7 +142,7 @@ export type Metadata = {
   /** Specific metadata elements to fetch. */
   elements?: Array<'deployment' | 'hasIndexingErrors' | 'hash' | 'number' | 'timestamp'>;
   /** Query metadata for a specific block. */
-  blockQuery?: BlockQuery;
+  blockQuery?: MetadataBlockQuery;
 };
 
 /**
@@ -146,7 +169,9 @@ export interface GraphParams {
   elements?: Array<ElementType>;
   /** Inline fragments for selecting fields on specific types. */
   inlineFragments?: Array<InlineFragmentType>;
-  /** Filter conditions for the query. */
+  /** Generic GraphQL arguments (schema-agnostic). */
+  args?: { [key: string]: GraphQLArgValue };
+  /** The Graph-specific 'where' filter conditions. */
   where?: QueryJson;
   /** Filter by specific entity ID (shortcut for where: { id: ... }). */
   id?: string;
@@ -160,7 +185,7 @@ export interface GraphParams {
   skip?: number;
   /** Re-run the query even if the subgraph has indexing errors. */
   subgraphError?: 'allow' | 'deny';
-  /** Query the collection state at a specific block. */
+  /** Query the collection state at a specific block (The Graph). */
   block?: BlockQuery;
 }
 
