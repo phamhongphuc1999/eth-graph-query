@@ -158,7 +158,7 @@ export type InlineFragmentType = {
   /** The collection name for the fragment (e.g., 'User'). */
   collection: string;
   /** Fields to select within the fragment. */
-  params?: Pick<GraphParams, 'elements'>;
+  params?: { elements?: Array<ElementType> };
 };
 
 /**
@@ -175,13 +175,13 @@ export interface GraphParams {
   where?: QueryJson;
   /** Filter by specific entity ID (shortcut for where: { id: ... }). */
   id?: string;
-  /** Number of items to return (max 1000). */
+  /** Number of items to return. */
   first?: number;
   /** Field to sort the results by. */
   orderBy?: string;
   /** Direction of the sort (asc or desc). */
   orderDirection?: 'asc' | 'desc';
-  /** Number of items to skip (max 5000). */
+  /** Number of items to skip. */
   skip?: number;
   /** Re-run the query even if the subgraph has indexing errors. */
   subgraphError?: 'allow' | 'deny';

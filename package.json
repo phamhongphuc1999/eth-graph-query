@@ -1,6 +1,6 @@
 {
   "name": "eth-graph-query",
-  "version": "2.0.21",
+  "version": "3.0.0",
   "description": "A lightweight GraphQL query builder and client with first-class support for The Graph. Build queries using JSON, avoid string concatenation, and keep strong TypeScript types.",
   "type": "module",
   "main": "./dist/index.cjs",
