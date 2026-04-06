@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 import { ApiQuery } from './api-query';
 import { QueryBuilder } from './query-builder';
-import { ErrorObject, GraphObject, Metadata } from './type';
+import type { ErrorObject, GraphObject, Metadata } from './type';
 
 /**
  * Main class for performing queries against The Graph protocols.

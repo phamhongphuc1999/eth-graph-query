@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 
 export const defaultHeader = { Accept: 'application/json', 'Content-Type': 'application/json' };
 
@@ -49,7 +49,11 @@ export class ApiQuery {
     config?: AxiosRequestConfig,
   ): Promise<T> {
     const fullUrl = `${this.root}${url}`;
-    const mergedConfig = { ...this.config, ...config };
+    const mergedConfig = {
+      ...this.config,
+      ...config,
+      headers: { ...(this.config.headers || {}), ...(config?.headers || {}) },
+    };
 
     const response = await (method === 'get' || method === 'delete'
       ? axios[method](fullUrl, mergedConfig)

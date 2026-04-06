@@ -1,18 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  ElementType,
-  GraphObject,
-  GraphParams,
-  InlineFragmentType,
-  Metadata,
   OptionKeys,
-  QueryJson,
+  type ElementType,
+  type GraphObject,
+  type GraphParams,
+  type InlineFragmentType,
+  type Metadata,
+  type QueryJson,
 } from './type';
 
 const MAX_FIRST = 1000;
 const MAX_SKIP = 5000;
 
 export class QueryBuilder {
+  private static escapeGraphqlString(value: string): string {
+    return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
+  private static serializeValue(value: string | number | boolean | null): string {
+    if (value === null) return 'null';
+    if (typeof value === 'string') return `"${this.escapeGraphqlString(value)}"`;
+    return `${value}`;
+  }
+
   /**
    * Converts a JSON query object into a GraphQL-compatible string.
    * Handles nested objects and operator mapping (e.g., $gt -> _gt).
@@ -30,11 +40,12 @@ export class QueryBuilder {
       } else if (Array.isArray(value)) {
         const queryArray = value as Array<string | number | boolean>;
         whereList.push(
-          `${key}: [${queryArray.map((item) => (typeof item === 'string' ? `"${item}"` : item)).join(', ')}]`,
+          `${key}: [${queryArray
+            .map((item) => (typeof item === 'string' ? this.serializeValue(item) : item))
+            .join(', ')}]`,
         );
-      } else if (typeof value === 'string') {
-        whereList.push(`${key}: "${value}"`);
-      } else if (typeof value === 'object') {
+      } else if (typeof value === 'string') whereList.push(`${key}: ${this.serializeValue(value)}`);
+      else if (typeof value === 'object') {
         const normalJson: QueryJson = {};
         const operatorJson: QueryJson = {};
         const options = value as { [key: string]: any };
@@ -48,20 +59,14 @@ export class QueryBuilder {
             } else {
               normalJson[option] = optionValue;
             }
-          } else {
-            normalJson[option] = optionValue;
-          }
+          } else normalJson[option] = optionValue;
         }
 
-        if (Object.keys(normalJson).length > 0) {
+        if (Object.keys(normalJson).length > 0)
           whereList.push(`${key}: {${this.buildJsonQuery(normalJson)}}`);
-        }
-        if (Object.keys(operatorJson).length > 0) {
-          whereList.push(this.buildJsonQuery(operatorJson));
-        }
-      } else {
-        whereList.push(`${key}: ${value}`);
-      }
+
+        if (Object.keys(operatorJson).length > 0) whereList.push(this.buildJsonQuery(operatorJson));
+      } else whereList.push(`${key}: ${value}`);
     }
     return whereList.join(', ');
   }
@@ -147,9 +152,10 @@ export class QueryBuilder {
     const { collection, params } = data;
     const filters: Array<string> = [];
 
-    if (params?.id !== undefined) filters.push(`id: ${params.id}`);
+    if (params?.id !== undefined) filters.push(`id: ${this.serializeValue(params.id)}`);
     if (params?.orderBy) filters.push(`orderBy: ${params.orderBy}`);
     if (params?.orderDirection) filters.push(`orderDirection: ${params.orderDirection}`);
+    if (params?.subgraphError) filters.push(`subgraphError: ${params.subgraphError}`);
 
     if (params?.first !== undefined) {
       const first = Math.max(0, Math.min(params.first, MAX_FIRST));
