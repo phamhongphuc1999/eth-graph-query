@@ -3,31 +3,22 @@ import { ApiQuery, type RequestOptions } from './api-query';
 import { QueryBuilder } from './query-builder';
 import type { ErrorObject, GraphObject, Metadata } from './type';
 
-/**
- * Main class for performing queries against The Graph protocols.
- * Extends ApiQuery to handle HTTP communication.
- */
-export class EthGraphQuery extends ApiQuery {
-  /** The name of the GraphQL query, used in makeFullQuery. */
-  queryName: string;
+export type EthGraphQueryOptions = RequestOptions & {
+  /** Applied to every query where `first` is not explicitly set. */
+  defaultFirst?: number;
+};
 
-  /**
-   * Initializes a new EthGraphQuery instance.
-   * @param rootUrl - The endpoint URL of the subgraph.
-   * @param config - Optional request configuration for custom headers or timeouts.
-   */
-  constructor(rootUrl: string, config?: RequestOptions) {
-    super(rootUrl, config);
+export class EthGraphQuery extends ApiQuery {
+  queryName: string;
+  private defaultFirst?: number;
+
+  constructor(rootUrl: string, config?: EthGraphQueryOptions) {
+    const { defaultFirst, ...requestOptions } = config ?? {};
+    super(rootUrl, requestOptions);
     this.queryName = 'query';
+    this.defaultFirst = defaultFirst;
   }
 
-  /**
-   * Executes a raw GraphQL query string.
-   * @template T - The expected return type of the data.
-   * @param data - The raw GraphQL query string.
-   * @returns A promise resolving to the query result.
-   * @throws Error if the response contains any GraphQL errors.
-   */
   async stringQuery<T = any>(data: string): Promise<T> {
     const result = await this.post<{ query: string }, any>('', { query: data });
 
@@ -40,27 +31,61 @@ export class EthGraphQuery extends ApiQuery {
     return result.data as T;
   }
 
-  /**
-   * Executes a single collection query using a JSON configuration.
-   * @template T - The expected return type of the data.
-   * @param data - The configuration for the collection query.
-   * @param metadata - Optional metadata fields to include in the query.
-   * @returns A promise resolving to the fetched data.
-   */
+  private applyDefaultFirst(data: GraphObject): GraphObject {
+    if (this.defaultFirst === undefined || data.params?.first !== undefined) return data;
+    return { ...data, params: { ...data.params, first: this.defaultFirst } };
+  }
+
+  /** Returns the full GraphQL query string without executing it. Useful for debugging. */
+  buildQueryString(data: GraphObject, metadata?: Metadata): string {
+    const sQuery = QueryBuilder.buildQuery(this.applyDefaultFirst(data), metadata);
+    return QueryBuilder.makeFullQuery(sQuery, this.queryName);
+  }
+
+  /** Returns the full GraphQL query string for a multi-collection query without executing it. */
+  buildMultipleQueryString(data: Array<GraphObject>, metadata?: Metadata): string {
+    const merged = data.map((item) => this.applyDefaultFirst(item));
+    const sQuery = QueryBuilder.buildMultipleQuery(merged, metadata);
+    return QueryBuilder.makeFullQuery(sQuery, this.queryName);
+  }
+
   async query<T = any>(data: GraphObject, metadata?: Metadata): Promise<T> {
-    const sQuery = QueryBuilder.buildQuery(data, metadata);
+    const sQuery = QueryBuilder.buildQuery(this.applyDefaultFirst(data), metadata);
+    return this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+  }
+
+  async multipleQuery<T = any>(data: Array<GraphObject>, metadata?: Metadata): Promise<T> {
+    const merged = data.map((item) => this.applyDefaultFirst(item));
+    const sQuery = QueryBuilder.buildMultipleQuery(merged, metadata);
     return this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
   }
 
   /**
-   * Executes multiple collection queries in a single request using JSON configurations.
-   * @template T - The expected return type of the data.
-   * @param data - An array of query configurations.
-   * @param metadata - Optional metadata fields to include in the query.
-   * @returns A promise resolving to the merged results of all queries.
+   * Fetches all pages of a collection by incrementing `skip` until results are exhausted.
+   * Returns the flat item array for `data.collection`.
+   * Stops at The Graph's max skip (5000) to avoid indexer errors.
    */
-  async multipleQuery<T = any>(data: Array<GraphObject>, metadata?: Metadata): Promise<T> {
-    const sQuery = QueryBuilder.buildMultipleQuery(data, metadata);
-    return this.stringQuery<T>(QueryBuilder.makeFullQuery(sQuery, this.queryName));
+  async queryAll<T = any>(data: GraphObject, pageSize = 1000): Promise<T[]> {
+    const results: T[] = [];
+    let skip = 0;
+    const clampedPageSize = Math.min(pageSize, 1000);
+
+    while (true) {
+      const page = await this.query<Record<string, T[]>>({
+        ...data,
+        params: { ...data.params, first: clampedPageSize, skip },
+      });
+
+      const items = page[data.collection];
+      if (!Array.isArray(items) || items.length === 0) break;
+
+      results.push(...items);
+      if (items.length < clampedPageSize) break;
+
+      skip += clampedPageSize;
+      if (skip >= 5000) break;
+    }
+
+    return results;
   }
 }

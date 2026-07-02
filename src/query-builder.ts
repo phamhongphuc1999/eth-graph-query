@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  OptionKeys,
   type ElementType,
   type GraphObject,
   type GraphParams,
@@ -12,7 +11,28 @@ import {
 
 const MAX_FIRST = 1000;
 const MAX_SKIP = 5000;
-const OPTION_KEYS_SET = new Set(OptionKeys as readonly string[]);
+const OPTION_KEYS_SET = new Set<string>([
+  'contains',
+  'contains_nocase',
+  'ends_with',
+  'ends_with_nocase',
+  'end_with_nocase',
+  'starts_with',
+  'starts_with_nocase',
+  'not_contains',
+  'not_contains_nocase',
+  'not_ends_with',
+  'not_ends_with_nocase',
+  'not_starts_with',
+  'not_starts_with_nocase',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'not',
+  'in',
+  'not_in',
+]);
 
 export class QueryBuilder {
   private static escapeGraphqlString(value: string): string {
@@ -48,12 +68,6 @@ export class QueryBuilder {
     return entries;
   }
 
-  /**
-   * Converts a JSON query object into a GraphQL-compatible string.
-   * Handles nested objects and operator mapping (e.g., $gt -> _gt).
-   * @param query - The JSON filter object to build.
-   * @returns A string representing the GraphQL 'where' or 'block' filter.
-   */
   static buildJsonQuery(query: QueryJson): string {
     const whereList = [];
     for (const key in query) {
@@ -61,7 +75,13 @@ export class QueryBuilder {
       const value = query[key];
       if (value === undefined) continue;
       if (value === null) whereList.push(`${key}: null`);
-      else if (Array.isArray(value)) {
+      else if ((key === '$and' || key === '$or') && Array.isArray(value)) {
+        const graphqlOp = key === '$and' ? '_and' : '_or';
+        const items = value as QueryJson[];
+        whereList.push(
+          `${graphqlOp}: [${items.map((item) => `{${this.buildJsonQuery(item)}}`).join(', ')}]`,
+        );
+      } else if (Array.isArray(value)) {
         const queryArray = value as Array<string | number | boolean>;
         whereList.push(
           `${key}: [${queryArray
@@ -97,11 +117,6 @@ export class QueryBuilder {
     return whereList.join(', ');
   }
 
-  /**
-   * Builds the fields/elements part of a GraphQL query from an array of strings or objects.
-   * @param elements - An array of fields to query. Can include nested collections as GraphObject.
-   * @returns An array of strings representing the selected fields.
-   */
   static buildElements(elements: Array<ElementType>): Array<string> {
     return elements.map((element) => {
       if (typeof element === 'string') return element;
@@ -110,11 +125,6 @@ export class QueryBuilder {
     });
   }
 
-  /**
-   * Builds the metadata (_meta) fragment of a GraphQL query.
-   * @param metadata - The metadata configuration.
-   * @returns A string representing the _meta query fragment.
-   */
   static buildMetadata(metadata: Metadata): string {
     let result = '';
     const blockQuery = [];
@@ -144,12 +154,6 @@ export class QueryBuilder {
     return result.length > 0 ? `_meta${result}` : '';
   }
 
-  /**
-   * Builds an inline fragment (... on Collection { ... }) for a query.
-   * @param fragment - The inline fragment configuration.
-   * @returns A string representing the inline fragment.
-   * @private
-   */
   private static _buildInlineFragment(fragment: InlineFragmentType): string {
     const elements = fragment.params?.elements?.length
       ? this.buildElements(fragment.params.elements)
@@ -157,24 +161,19 @@ export class QueryBuilder {
     return `... on ${fragment.collection}{${elements.join(' ')}}`;
   }
 
-  /**
-   * Builds multiple inline fragments from an array of fragment configurations.
-   * @param fragments - An array of inline fragments.
-   * @returns A string containing all built inline fragments.
-   */
   static buildInlineFragments(fragments: Array<InlineFragmentType>): string {
     return fragments.map((fragment) => this._buildInlineFragment(fragment)).join(' ');
   }
 
-  /**
-   * Builds a complete GraphQL query for a single collection.
-   * @param data - The collection and parameters for the query.
-   * @param metadata - Optional metadata configuration.
-   * @returns A string containing the GraphQL query for the collection.
-   */
   static buildQuery(data: GraphObject, metadata?: Metadata): string {
     const { collection, params } = data;
     const filters: Array<string> = [];
+
+    if (params?.args && params?.where) {
+      console.warn(
+        '[eth-graph-query] Both `args` and `where` are set. For The Graph schemas use only `where`; for generic GraphQL use only `args`.',
+      );
+    }
 
     if (params?.id !== undefined) filters.push(`id: ${this.serializeValue(params.id)}`);
     if (params?.orderBy) filters.push(`orderBy: ${params.orderBy}`);
@@ -218,12 +217,6 @@ export class QueryBuilder {
     return finalQuery;
   }
 
-  /**
-   * Builds a query that targets multiple collections simultaneously.
-   * @param data - An array of collection queries and their parameters.
-   * @param metadata - Optional metadata configuration that applies to the entire query.
-   * @returns A string containing the merged GraphQL query for multiple collections.
-   */
   static buildMultipleQuery(data: Array<GraphObject>, metadata?: Metadata): string {
     const queries = data.map((item) =>
       this.buildQuery({ collection: item.collection, params: item.params }),
@@ -237,12 +230,6 @@ export class QueryBuilder {
     return finalQuery;
   }
 
-  /**
-   * Wraps a query fragment into a full GraphQL 'query' block.
-   * @param query - The query fragment to wrap.
-   * @param queryName - An optional name for the GraphQL query (defaults to 'query').
-   * @returns The full GraphQL query string.
-   */
   static makeFullQuery(query: string, queryName = 'query'): string {
     return `query ${queryName} {${query}}`;
   }
